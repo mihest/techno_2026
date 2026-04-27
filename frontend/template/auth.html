@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход / Регистрация — ГорКвест</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="app-header">
+    <a href="index.html" class="app-logo">
+        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
+        <span class="gradient-text">ГорКвест</span>
+    </a>
+</header>
+
+<main class="main-content flex items-center justify-center" style="flex:1; padding:20px;">
+    <div class="container">
+        <div class="card animate-pop" style="max-width:420px; width:100%; margin:0 auto;">
+            <div class="card-body">
+                <h2 class="gradient-text text-center mb-16">Вход / Регистрация</h2>
+                <div class="tabs mb-16">
+                    <button class="tab active" id="tabLogin">Вход</button>
+                    <button class="tab" id="tabRegister">Регистрация</button>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" class="form-input" placeholder="user@demo.ru" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-lock"></i> Пароль</label>
+                        <input type="password" class="form-input" placeholder="••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg"><i class="fas fa-sign-in-alt"></i> Войти</button>
+                    <p class="text-center mt-16" style="font-size:0.8rem;color:var(--text-muted);">Демо: moderator@demo.ru / demo123</p>
+                </form>
+                <form id="registerForm" class="hidden">
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-lock"></i> Пароль (≥6 символов)</label>
+                        <input type="password" class="form-input" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-lock"></i> Подтверждение</label>
+                        <input type="password" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-user"></i> Никнейм</label>
+                        <input type="text" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-calendar-alt"></i> Возрастная группа</label>
+                        <select class="form-select" required>
+                            <option value="">Выберите...</option>
+                            <option>14-15</option>
+                            <option>16-17</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-accent btn-block btn-lg"><i class="fas fa-user-plus"></i> Зарегистрироваться</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="app.js"></script>
+<script>
+    document.getElementById('tabLogin').onclick = () => {
+        document.getElementById('tabLogin').classList.add('active');
+        document.getElementById('tabRegister').classList.remove('active');
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('registerForm').classList.add('hidden');
+    };
+    document.getElementById('tabRegister').onclick = () => {
+        document.getElementById('tabRegister').classList.add('active');
+        document.getElementById('tabLogin').classList.remove('active');
+        document.getElementById('registerForm').classList.remove('hidden');
+        document.getElementById('loginForm').classList.add('hidden');
+    };
+    document.getElementById('loginForm').onsubmit = (e) => {
+        e.preventDefault();
+        const email = e.target.querySelector('input[type=email]').value;
+        const pwd = e.target.querySelector('input[type=password]').value;
+        demoLogin(email, pwd);
+        setTimeout(() => location.href = 'index.html', 500);
+    };
+    document.getElementById('registerForm').onsubmit = (e) => {
+        e.preventDefault();
+        demoLogin(e.target.querySelector('input[type=email]').value, 'password');
+        setTimeout(() => location.href = 'index.html', 500);
+    };
+</script>
+</body>
+</html>

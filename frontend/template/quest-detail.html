@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали квеста — ГорКвест</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="has-sidebar">
+<header class="app-header">
+    <a href="index.html" class="app-logo">
+        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
+        <span class="gradient-text">ГорКвест</span>
+    </a>
+    <div class="header-actions">
+        <a href="auth.html" class="btn btn-ghost btn-sm" data-auth><i class="fas fa-sign-in-alt"></i> Войти</a>
+        <a href="moderation.html" class="badge badge-warning" data-role="moderator"><i class="fas fa-shield-alt"></i> Модератор</a>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="container">
+        <div class="card animate-pop">
+            <div class="quest-card-img" style="height:200px;">
+                <i class="fas fa-mask fa-4x icon-primary"></i>
+            </div>
+            <div class="card-body">
+                <h1>Тайны Арбата</h1>
+                <div class="flex gap-8 mt-16">
+                    <span class="badge badge-primary"><i class="fas fa-user"></i> Автор: user3</span>
+                    <span class="badge badge-success"><i class="fas fa-check"></i> Опубликован</span>
+                </div>
+                <p class="mt-16">Прогулка по старинным переулкам Арбата с загадками об истории района.</p>
+                <div class="flex gap-12 flex-wrap mt-16">
+                    <span class="badge badge-primary"><i class="fas fa-star"></i> 2/5</span>
+                    <span class="badge badge-accent"><i class="fas fa-clock"></i> 45 мин</span>
+                    <span class="badge badge-success"><i class="fas fa-flag"></i> 5 чекпоинтов</span>
+                </div>
+                <div class="map-container mt-16">
+                    <div class="map-placeholder">
+                        <i class="fas fa-map fa-2x text-muted"></i>
+                    </div>
+                </div>
+                <h3 class="mt-16"><i class="fas fa-list-ol"></i> Чекпоинты</h3>
+                <div class="checkpoint-item"><span class="checkpoint-number">1</span><div>Старт у театра Вахтангова</div></div>
+                <div class="checkpoint-item"><span class="checkpoint-number">2</span><div>Стена Цоя</div></div>
+                <div class="checkpoint-item"><span class="checkpoint-number">3</span><div>Дом с привидениями</div></div>
+                <button class="btn btn-accent btn-block btn-lg mt-16" onclick="location.href='quest-session.html'">
+                    <i class="fas fa-play"></i> Начать квест
+                </button>
+                <button class="btn btn-ghost btn-block text-danger mt-16" onclick="openModal(reportForm())">
+                    <i class="fas fa-flag"></i> Пожаловаться
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<nav class="tab-bar">
+    <a href="index.html" class="tab-bar-item"><i class="fas fa-map"></i><span>Карта</span></a>
+    <a href="quests.html" class="tab-bar-item active"><i class="fas fa-list-ul"></i><span>Квесты</span></a>
+    <a href="teams.html" class="tab-bar-item"><i class="fas fa-users"></i><span>Команды</span></a>
+    <a href="rating.html" class="tab-bar-item"><i class="fas fa-trophy"></i><span>Рейтинг</span></a>
+    <a href="profile.html" class="tab-bar-item"><i class="fas fa-user"></i><span>Профиль</span></a>
+</nav>
+
+<aside class="sidebar">
+    <a href="index.html" class="app-logo">
+        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
+        <span class="gradient-text">ГорКвест</span>
+    </a>
+    <nav class="sidebar-nav">
+        <a href="index.html"><i class="fas fa-map"></i> Карта</a>
+        <a href="quests.html" class="active"><i class="fas fa-list-ul"></i> Лента квестов</a>
+        <a href="teams.html"><i class="fas fa-users"></i> Команды</a>
+        <a href="rating.html"><i class="fas fa-trophy"></i> Рейтинг</a>
+        <a href="profile.html"><i class="fas fa-user"></i> Профиль</a>
+        <a href="achievements.html"><i class="fas fa-medal"></i> Достижения</a>
+        <a href="create-quest.html"><i class="fas fa-plus-circle"></i> Создать квест</a>
+        <hr style="border-color:var(--border-light);margin:8px 0;">
+        <a href="moderation.html" data-role="moderator" class="hidden"><i class="fas fa-shield-alt"></i> Модерация</a>
+    </nav>
+</aside>
+
+<script src="app.js"></script>
+<script>
+    function reportForm() {
+        return `<h3 class="modal-title"><i class="fas fa-flag"></i> Жалоба на квест</h3>
+        <form onsubmit="event.preventDefault(); closeModal(); showToast('Жалоба отправлена','success');">
+          <div class="form-group">
+            <select class="form-select">
+              <option>Опасный маршрут</option>
+              <option>Спам</option>
+              <option>Оскорбительный контент</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <textarea class="form-textarea" placeholder="Комментарий"></textarea>
+          </div>
+          <button class="btn btn-danger btn-block">Отправить</button>
+        </form>`;
+    }
+</script>
+</body>
+</html>

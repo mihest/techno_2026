@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Городские квесты — Карта</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=6b2b42a0-28a0-4e74-9f1b-7b685c9fd6cb&lang=ru_RU"></script>
+</head>
+<body class="has-sidebar">
+<header class="app-header">
+    <a href="index.html" class="app-logo">
+        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
+        <span class="gradient-text">ГорКвест</span>
+    </a>
+    <div class="header-actions">
+        <a href="auth.html" class="btn btn-ghost btn-sm" data-auth><i class="fas fa-sign-in-alt"></i> Войти</a>
+        <a href="moderation.html" class="badge badge-warning" data-role="moderator"><i class="fas fa-shield-alt"></i> Модератор</a>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="map-container fullscreen" id="map"></div>
+    <div class="map-filters">
+        <button class="filter-chip active">Все</button>
+        <button class="filter-chip"><i class="fas fa-star"></i> 1-2</button>
+        <button class="filter-chip"><i class="fas fa-star"></i> 3</button>
+        <button class="filter-chip"><i class="fas fa-star"></i> 4-5</button>
+        <button class="btn btn-ghost btn-sm" onclick="navigator.geolocation.getCurrentPosition(p=>window.map.setCenter([p.coords.latitude,p.coords.longitude],14))">
+            <i class="fas fa-location-dot"></i>
+        </button>
+    </div>
+</main>
+
+<nav class="tab-bar">
+    <a href="index.html" class="tab-bar-item active"><i class="fas fa-map"></i><span>Карта</span></a>
+    <a href="quests.html" class="tab-bar-item"><i class="fas fa-list-ul"></i><span>Квесты</span></a>
+    <a href="teams.html" class="tab-bar-item"><i class="fas fa-users"></i><span>Команды</span></a>
+    <a href="rating.html" class="tab-bar-item"><i class="fas fa-trophy"></i><span>Рейтинг</span></a>
+    <a href="profile.html" class="tab-bar-item"><i class="fas fa-user"></i><span>Профиль</span></a>
+</nav>
+
+<aside class="sidebar">
+    <a href="index.html" class="app-logo">
+        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
+        <span class="gradient-text">ГорКвест</span>
+    </a>
+    <nav class="sidebar-nav">
+        <a href="index.html" class="active"><i class="fas fa-map"></i> Карта</a>
+        <a href="quests.html"><i class="fas fa-list-ul"></i> Лента квестов</a>
+        <a href="teams.html"><i class="fas fa-users"></i> Команды</a>
+        <a href="rating.html"><i class="fas fa-trophy"></i> Рейтинг</a>
+        <a href="profile.html"><i class="fas fa-user"></i> Профиль</a>
+        <a href="achievements.html"><i class="fas fa-medal"></i> Достижения</a>
+        <a href="create-quest.html"><i class="fas fa-plus-circle"></i> Создать квест</a>
+        <hr style="border-color:var(--border-light);margin:8px 0;">
+        <a href="moderation.html" data-role="moderator" class="hidden"><i class="fas fa-shield-alt"></i> Модерация</a>
+    </nav>
+</aside>
+
+<script src="app.js"></script>
+<script>
+    ymaps.ready(() => {
+        window.map = new ymaps.Map('map', {
+            center: [55.751244, 37.618423], zoom: 12,
+            controls: ['zoomControl']
+        });
+        const quests = [
+            { coords:[55.7495,37.5916], name:'Тайны Арбата', diff:2 },
+            { coords:[55.7298,37.6015], name:'Парк Горького', diff:3 },
+            { coords:[55.8262,37.6372], name:'ВДНХ: Космический', diff:4 },
+        ];
+        quests.forEach(q => {
+            window.map.geoObjects.add(new ymaps.Placemark(q.coords, {
+                hintContent: q.name,
+                balloonContent: `<b>${q.name}</b><br>${'⭐'.repeat(q.diff)}`
+            }));
+        });
+    });
+</script>
+</body>
+</html>
