@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Команды — ГорКвест</title>
+    <link rel="stylesheet" href="src/css/styles.css">
+    <link rel="stylesheet" href="src/assets/fonts/fontawesome-free-7.2.0-web/css/all.min.css">
+</head>
+<body class="has-sidebar">
+<header class="app-header">
+    <a href="index.html" class="app-logo">
+        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
+        <span class="gradient-text">ГорКвест</span>
+    </a>
+    <div class="header-actions">
+        <a href="auth.html" class="btn btn-ghost btn-sm" data-auth><i class="fas fa-sign-in-alt"></i> Войти</a>
+        <a href="profile.html" class="btn btn-ghost btn-sm hidden" data-user>
+            <span class="user-shortcut" id="userNickShort"></span>
+        </a>
+        <a href="moderation.html" class="badge badge-warning hidden" data-role="moderator"><i
+                class="fas fa-shield-alt"></i> Модер</a>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="container">
+        <div class="flex justify-between items-center mb-16">
+            <h2><i class="fas fa-users"></i> Команды</h2>
+            <button class="btn btn-primary btn-sm" onclick="openModal('teams-modal')"><i class="fas fa-plus"></i>
+                Создать
+            </button>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-input" placeholder="Код команды..." id="joinCode">
+        </div>
+        <button class="btn btn-accent btn-block mb-16" onclick="joinTeam()"><i class="fas fa-key"></i> Вступить по коду
+        </button>
+
+        <div id="teamsList" class="flex flex-col gap-12"></div>
+    </div>
+</main>
+
+<nav class="tab-bar">
+    <a href="index.html" class="tab-bar-item"><i class="fas fa-map"></i><span>Карта</span></a>
+    <a href="quests.html" class="tab-bar-item"><i class="fas fa-list-ul"></i><span>Квесты</span></a>
+    <a href="teams.html" class="tab-bar-item active"><i class="fas fa-users"></i><span>Команды</span></a>
+    <a href="rating.html" class="tab-bar-item"><i class="fas fa-trophy"></i><span>Рейтинг</span></a>
+    <a href="profile.html" class="tab-bar-item"><i class="fas fa-user"></i><span>Профиль</span></a>
+</nav>
+
+<aside class="sidebar">
+    <a href="index.html" class="app-logo">
+        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
+        <span class="gradient-text">ГорКвест</span>
+    </a>
+    <nav class="sidebar-nav">
+        <a href="index.html"><i class="fas fa-map"></i> Карта</a>
+        <a href="quests.html"><i class="fas fa-list-ul"></i> Лента квестов</a>
+        <a href="teams.html" class="active"><i class="fas fa-users"></i> Команды</a>
+        <a href="rating.html"><i class="fas fa-trophy"></i> Рейтинг</a>
+        <a href="profile.html"><i class="fas fa-user"></i> Профиль</a>
+        <a href="achievements.html"><i class="fas fa-medal"></i> Достижения</a>
+        <a href="create-quest.html"><i class="fas fa-plus-circle"></i> Создать квест</a>
+        <hr style="border-color:var(--border-light);margin:8px 0;">
+        <a href="moderation.html" data-role="moderator"><i class="fas fa-shield-alt"></i> Модерация</a>
+    </nav>
+</aside>
+
+<div class="modal-overlay hidden" id="teams-modal">
+    <div class="modal">
+        <button onclick="closeModal('teams-modal')" class="modal-close">×</button>
+        <div>
+            <h3 class="modal-title"><i class="fas fa-users"></i> Новая команда</h3>
+            <form onsubmit="event.preventDefault();closeModal('teams-modal');showToast('Команда создана','success');">
+                <div class="form-group">
+                    <input class="form-input" placeholder="Название" required>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-textarea" placeholder="Описание"></textarea>
+                </div>
+                <button class="btn btn-primary btn-block">Создать</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="src/js/app.js"></script>
+<script src="src/js/teams.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали команды — ГорКвест</title>
+    <link rel="stylesheet" href="src/css/styles.css">
+    <link rel="stylesheet" href="src/assets/fonts/fontawesome-free-7.2.0-web/css/all.min.css">
+</head>
+<body class="has-sidebar">
+<header class="app-header">
+    <a href="index.html" class="app-logo">
+        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
+        <span class="gradient-text">ГорКвест</span>
+    </a>
+    <div class="header-actions">
+        <a href="auth.html" class="btn btn-ghost btn-sm" data-auth><i class="fas fa-sign-in-alt"></i> Войти</a>
+        <a href="profile.html" class="btn btn-ghost btn-sm hidden" data-user>
+            <span class="user-shortcut" id="userNickShort"></span>
+        </a>
+        <a href="moderation.html" class="badge badge-warning hidden" data-role="moderator"><i
+                class="fas fa-shield-alt"></i> Модер</a>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="container">
+        <div class="card animate-pop">
+            <div class="profile-hero">
+                <i class="fas fa-paw fa-3x"></i>
+                <h2>Городские лисы</h2>
+                <p><span class="badge badge-primary"><i class="fas fa-key"></i> ABC123</span></p>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">Команда исследователей центральных районов Москвы.</p>
+                <div class="stats-grid">
+                    <div><span class="stat-number">980</span><br/>очков</div>
+                    <div><span class="stat-number">6</span><br/>квестов</div>
+                    <div><span class="stat-number">3</span><br/>участника</div>
+                </div>
+                <h3 class="mb-16"><i class="fas fa-users"></i> Состав</h3>
+                <div class="flex flex-col gap-8">
+                    <div class="checkpoint-item">
+                        <span class="avatar avatar-sm"><i class="fas fa-user"></i></span> Алексей
+                        <span class="badge badge-accent ml-auto">Капитан</span>
+                    </div>
+                    <div class="checkpoint-item">
+                        <span class="avatar avatar-sm"><i class="fas fa-user"></i></span> Мария
+                    </div>
+                    <div class="checkpoint-item">
+                        <span class="avatar avatar-sm"><i class="fas fa-user"></i></span> Дмитрий
+                    </div>
+                </div>
+                <button class="btn btn-accent btn-block mt-16" onclick="location.href='quest-session.html'">
+                    <i class="fas fa-play"></i> Начать квест
+                </button>
+                <button class="btn btn-ghost btn-block text-danger mt-16">
+                    <i class="fas fa-sign-out-alt"></i> Покинуть команду
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<nav class="tab-bar">
+    <a href="index.html" class="tab-bar-item"><i class="fas fa-map"></i><span>Карта</span></a>
+    <a href="quests.html" class="tab-bar-item"><i class="fas fa-list-ul"></i><span>Квесты</span></a>
+    <a href="teams.html" class="tab-bar-item active"><i class="fas fa-users"></i><span>Команды</span></a>
+    <a href="rating.html" class="tab-bar-item"><i class="fas fa-trophy"></i><span>Рейтинг</span></a>
+    <a href="profile.html" class="tab-bar-item"><i class="fas fa-user"></i><span>Профиль</span></a>
+</nav>
+
+<aside class="sidebar">
+    <a href="index.html" class="app-logo">
+        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
+        <span class="gradient-text">ГорКвест</span>
+    </a>
+    <nav class="sidebar-nav">
+        <a href="index.html"><i class="fas fa-map"></i> Карта</a>
+        <a href="quests.html"><i class="fas fa-list-ul"></i> Лента квестов</a>
+        <a href="teams.html" class="active"><i class="fas fa-users"></i> Команды</a>
+        <a href="rating.html"><i class="fas fa-trophy"></i> Рейтинг</a>
+        <a href="profile.html"><i class="fas fa-user"></i> Профиль</a>
+        <a href="achievements.html"><i class="fas fa-medal"></i> Достижения</a>
+        <a href="create-quest.html"><i class="fas fa-plus-circle"></i> Создать квест</a>
+        <hr style="border-color:var(--border-light);margin:8px 0;">
+        <a href="moderation.html" data-role="moderator"><i class="fas fa-shield-alt"></i> Модерация</a>
+    </nav>
+</aside>
+
+<script src="src/js/app.js"></script>
+</body>
+</html>
