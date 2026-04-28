@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Imprezzio: Path - Рейтинг</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="themes/theme-default.css" id="themeStylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">Imprezzio:<span>Path</span></a>
+            <div class="nav-links">
+                <a href="index.html">Квесты</a>
+                <a href="rating.html" class="active">Рейтинг</a>
+                <a href="profile.html">Профиль</a>
+                <a href="create-quest.html">Создать</a>
+                <a href="moderation.html">Модерация</a>
+            </div>
+            <div class="header-controls">
+                <div class="theme-selector">
+                    <i class="fas fa-palette"></i>
+                    <div class="custom-select-wrapper">
+                        <select id="themeSelect" class="theme-select">
+                            <option value="default">🌈 Neon Pop</option>
+                            <option value="neon-sunset">🌅 Neon Sunset</option>
+                            <option value="cyberpunk">💀 Cyberpunk 2077</option>
+                            <option value="tropical">🍍 Tropical Juice</option>
+                            <option value="ice-flame">❄️ Ice Flame</option>
+                            <option value="space-rave">🚀 Space Rave</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </button>
+            </div>
+            <button class="burger-btn" id="burgerBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+    
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="close-menu" id="closeMenuBtn"><i class="fas fa-times"></i></button>
+        <a href="index.html">Квесты</a>
+        <a href="rating.html" class="active">Рейтинг</a>
+        <a href="profile.html">Профиль</a>
+        <a href="create-quest.html">Создать</a>
+        <a href="moderation.html">Модерация</a>
+        <div class="mobile-theme-selector">
+            <i class="fas fa-palette"></i>
+            <div class="custom-select-wrapper">
+                <select id="mobileThemeSelect" class="theme-select">
+                    <option value="default">🌈 Neon Pop</option>
+                    <option value="neon-sunset">🌅 Neon Sunset</option>
+                    <option value="cyberpunk">💀 Cyberpunk 2077</option>
+                    <option value="tropical">🍍 Tropical Juice</option>
+                    <option value="ice-flame">❄️ Ice Flame</option>
+                    <option value="space-rave">🚀 Space Rave</option>
+                </select>
+                <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+        </div>
+        <button class="logout-btn mobile-logout" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Выйти из аккаунта</span>
+        </button>
+    </div>
+
+    <main class="container">
+        <div class="ranking-header">
+            <h1><i class="fas fa-trophy"></i> Таблица лидеров</h1>
+            <p>Соревнуйтесь с другими игроками и командами!</p>
+        </div>
+        
+        <div class="tab-switch">
+            <button class="tab-btn-ranking active" data-tab="teams">Команды</button>
+            <button class="tab-btn-ranking" data-tab="solo">Соло-игроки</button>
+        </div>
+        
+        <!-- Таблица команд -->
+        <div id="teamsRanking" class="ranking-table-container active">
+            <div class="table-wrapper">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Место</th>
+                            <th>Название команды</th>
+                            <th>Пройдено квестов</th>
+                            <th>Очки</th>
+                            <th>Среднее время</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="rank-1"><i class="fas fa-crown"></i> 1</td>
+                            <td><strong>🏆 Искатели приключений</strong></td>
+                            <td>24</td>
+                            <td class="points">3,850</td>
+                            <td>72 мин</td>
+                        </tr>
+                        <tr>
+                            <td class="rank-2"><i class="fas fa-medal"></i> 2</td>
+                            <td><strong>Ночные волки</strong></td>
+                            <td>18</td>
+                            <td class="points">2,910</td>
+                            <td>85 мин</td>
+                        </tr>
+                        <tr>
+                            <td class="rank-3"><i class="fas fa-medal"></i> 3</td>
+                            <td><strong>Энтузиасты</strong></td>
+                            <td>15</td>
+                            <td class="points">2,450</td>
+                            <td>79 мин</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Путешественники</td>
+                            <td>12</td>
+                            <td class="points">1,890</td>
+                            <td>94 мин</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Головоломщики</td>
+                            <td>10</td>
+                            <td class="points">1,560</td>
+                            <td>68 мин</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Квестоманы</td>
+                            <td>8</td>
+                            <td class="points">1,240</td>
+                            <td>103 мин</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Следопыты</td>
+                            <td>7</td>
+                            <td class="points">980</td>
+                            <td>91 мин</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Исследователи</td>
+                            <td>5</td>
+                            <td class="points">750</td>
+                            <td>110 мин</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>Победители</td>
+                            <td>4</td>
+                            <td class="points">620</td>
+                            <td>67 мин</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>Новички</td>
+                            <td>3</td>
+                            <td class="points">480</td>
+                            <td>88 мин</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Таблица соло-игроков -->
+        <div id="soloRanking" class="ranking-table-container">
+            <div class="table-wrapper">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Место</th>
+                            <th>Игрок</th>
+                            <th>Возраст</th>
+                            <th>Пройдено квестов</th>
+                            <th>Очки</th>
+                            <th>Среднее время</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="rank-1"><i class="fas fa-crown"></i> 1</td>
+                            <td><strong>🏆 alex_explorer</strong></td>
+                            <td>16 лет</td>
+                            <td>32</td>
+                            <td class="points">4,850</td>
+                            <td>65 мин</td>
+                        </tr>
+                        <tr>
+                            <td class="rank-2"><i class="fas fa-medal"></i> 2</td>
+                            <td><strong>quest_master</strong></td>
+                            <td>17 лет</td>
+                            <td>28</td>
+                            <td class="points">4,210</td>
+                            <td>71 мин</td>
+                        </tr>
+                        <tr>
+                            <td class="rank-3"><i class="fas fa-medal"></i> 3</td>
+                            <td><strong>puzzle_solver</strong></td>
+                            <td>15 лет</td>
+                            <td>22</td>
+                            <td class="points">3,340</td>
+                            <td>78 мин</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>urban_walker</td>
+                            <td>16 лет</td>
+                            <td>19</td>
+                            <td class="points">2,850</td>
+                            <td>82 мин</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>history_buff</td>
+                            <td>17 лет</td>
+                            <td>15</td>
+                            <td class="points">2,290</td>
+                            <td>90 мин</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>tech_genius</td>
+                            <td>14 лет</td>
+                            <td>12</td>
+                            <td class="points">1,820</td>
+                            <td>95 мин</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>nature_lover</td>
+                            <td>15 лет</td>
+                            <td>10</td>
+                            <td class="points">1,510</td>
+                            <td>87 мин</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>art_enjoyer</td>
+                            <td>16 лет</td>
+                            <td>8</td>
+                            <td class="points">1,190</td>
+                            <td>101 мин</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>sport_fan</td>
+                            <td>14 лет</td>
+                            <td>6</td>
+                            <td class="points">890</td>
+                            <td>76 мин</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>mystic_seeker</td>
+                            <td>17 лет</td>
+                            <td>5</td>
+                            <td class="points">740</td>
+                            <td>112 мин</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-logo">
+                <a href="index.html" class="logo">Imprezzio:<span>Path</span></a>
+                <p>Городские квесты для активных подростков</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>О проекте</h4>
+                    <a href="#">О нас</a>
+                    <a href="#">Правила</a>
+                    <a href="#">Контакты</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Помощь</h4>
+                    <a href="#">FAQ</a>
+                    <a href="#">Поддержка</a>
+                    <a href="#">Безопасность</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Соцсети</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-vk"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Imprezzio: Path. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/theme-switcher.js"></script>
+    <script>
+        // Бургер-меню
+        const burgerBtn = document.getElementById('burgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        
+        function openMenu() {
+            mobileMenu.classList.add('active');
+            menuOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMenu() {
+            mobileMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        burgerBtn?.addEventListener('click', openMenu);
+        closeMenuBtn?.addEventListener('click', closeMenu);
+        menuOverlay?.addEventListener('click', closeMenu);
+        
+        // Выход из аккаунта
+        const logoutBtn = document.getElementById('logoutBtn');
+        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+        
+        function handleLogout() {
+            if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
+                window.location.href = 'auth/login.html';
+            }
+        }
+        
+        logoutBtn?.addEventListener('click', handleLogout);
+        mobileLogoutBtn?.addEventListener('click', handleLogout);
+        
+        // Переключение вкладок рейтинга
+        const teamsRanking = document.getElementById('teamsRanking');
+        const soloRanking = document.getElementById('soloRanking');
+        const rankingTabs = document.querySelectorAll('.tab-btn-ranking');
+        
+        rankingTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.dataset.tab;
+                
+                rankingTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                if (tabId === 'teams') {
+                    teamsRanking.classList.add('active');
+                    soloRanking.classList.remove('active');
+                } else {
+                    teamsRanking.classList.remove('active');
+                    soloRanking.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Imprezzio: Path - Личный кабинет</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="themes/theme-default.css" id="themeStylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">Imprezzio:<span>Path</span></a>
+            <div class="nav-links">
+                <a href="index.html">Квесты</a>
+                <a href="rating.html">Рейтинг</a>
+                <a href="profile.html" class="active">Профиль</a>
+                <a href="create-quest.html">Создать</a>
+                <a href="moderation.html">Модерация</a>
+            </div>
+            <div class="header-controls">
+                <div class="theme-selector">
+                    <i class="fas fa-palette"></i>
+                    <div class="custom-select-wrapper">
+                        <select id="themeSelect" class="theme-select">
+                            <option value="default">🌈 Neon Pop</option>
+                            <option value="neon-sunset">🌅 Neon Sunset</option>
+                            <option value="cyberpunk">💀 Cyberpunk 2077</option>
+                            <option value="tropical">🍍 Tropical Juice</option>
+                            <option value="ice-flame">❄️ Ice Flame</option>
+                            <option value="space-rave">🚀 Space Rave</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </button>
+            </div>
+            <button class="burger-btn" id="burgerBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+    
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="close-menu" id="closeMenuBtn"><i class="fas fa-times"></i></button>
+        <a href="index.html">Квесты</a>
+        <a href="rating.html">Рейтинг</a>
+        <a href="profile.html" class="active">Профиль</a>
+        <a href="create-quest.html">Создать</a>
+        <a href="moderation.html">Модерация</a>
+        <div class="mobile-theme-selector">
+            <i class="fas fa-palette"></i>
+            <div class="custom-select-wrapper">
+                <select id="mobileThemeSelect" class="theme-select">
+                    <option value="default">🌈 Neon Pop</option>
+                    <option value="neon-sunset">🌅 Neon Sunset</option>
+                    <option value="cyberpunk">💀 Cyberpunk 2077</option>
+                    <option value="tropical">🍍 Tropical Juice</option>
+                    <option value="ice-flame">❄️ Ice Flame</option>
+                    <option value="space-rave">🚀 Space Rave</option>
+                </select>
+                <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+        </div>
+        <button class="logout-btn mobile-logout" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Выйти из аккаунта</span>
+        </button>
+    </div>
+
+    <main class="container">
+        <!-- Профиль пользователя -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <div class="avatar-circle">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+            </div>
+            <div class="profile-info">
+                <div class="profile-name-row">
+                    <h2>Алексей Маршрутов</h2>
+                </div>
+                <div class="email">alex@imprezzio.ru</div>
+                <div class="birthdate" id="birthdateDisplay">
+                    <i class="fas fa-calendar-alt"></i> 
+                    <span id="birthdateText">15 марта 2009 (16 лет)</span>
+                    <button class="edit-birthdate-btn" id="editProfileBtn" title="Редактировать дату рождения">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Статистика на полную ширину -->
+        <div class="stats-grid-full">
+            <div class="stat-card">
+                <i class="fas fa-flag-checkered"></i>
+                <div class="number">14</div>
+                <div>пройдено</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-trophy"></i>
+                <div class="number">2,450</div>
+                <div>очков</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <div class="number">3</div>
+                <div>команды</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-map-marked-alt"></i>
+                <div class="number">2</div>
+                <div>создано</div>
+            </div>
+        </div>
+        
+        <!-- Вкладки -->
+        <div class="profile-tabs">
+            <button class="tab-btn active" data-tab="created">Созданные квесты</button>
+            <button class="tab-btn" data-tab="completed">Пройденные квесты</button>
+            <button class="tab-btn" data-tab="teams">Мои команды</button>
+            <button class="tab-btn" data-tab="achievements">Достижения</button>
+        </div>
+        
+        <!-- Созданные квесты -->
+        <div id="created-tab" class="tab-content active">
+            <div class="quest-item">
+                <div class="quest-item-info">
+                    <div class="quest-item-title">Тайны Старого Арбата</div>
+                    <div class="quest-item-meta">История, Архитектура • 5 чекпоинтов</div>
+                </div>
+                <div class="quest-item-actions">
+                    <span class="quest-status status-published"><i class="fas fa-check-circle"></i> Опубликован</span>
+                </div>
+            </div>
+            <div class="quest-item">
+                <div class="quest-item-info">
+                    <div class="quest-item-title">Техно-парк Будущего</div>
+                    <div class="quest-item-meta">Технологии, Наука • 7 чекпоинтов</div>
+                </div>
+                <div class="quest-item-actions">
+                    <span class="quest-status status-moderation"><i class="fas fa-hourglass-half"></i> На модерации</span>
+                </div>
+            </div>
+            <div class="quest-item">
+                <div class="quest-item-info">
+                    <div class="quest-item-title">Заброшенный чердак</div>
+                    <div class="quest-item-meta">Мистика • 4 чекпоинта</div>
+                </div>
+                <div class="quest-item-actions">
+                    <span class="quest-status status-draft"><i class="fas fa-pencil-alt"></i> Черновик</span>
+                    <button class="btn btn-primary btn-sm">Редактировать</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Пройденные квесты -->
+        <div id="completed-tab" class="tab-content">
+            <div class="quest-item">
+                <div class="quest-item-info">
+                    <div class="quest-item-title">Исторический центр</div>
+                    <div class="quest-item-meta">Завершён соло • 12.04.2025</div>
+                </div>
+                <div class="quest-item-actions">
+                    <span class="quest-status status-published"><i class="fas fa-star"></i> 320 очков</span>
+                </div>
+            </div>
+            <div class="quest-item">
+                <div class="quest-item-info">
+                    <div class="quest-item-title">Техно-район</div>
+                    <div class="quest-item-meta">Завершён с командой "Энтузиасты" • 01.04.2025</div>
+                </div>
+                <div class="quest-item-actions">
+                    <span class="quest-status status-published"><i class="fas fa-star"></i> 450 очков</span>
+                </div>
+            </div>
+            <div class="quest-item">
+                <div class="quest-item-info">
+                    <div class="quest-item-title">Архитектурный код</div>
+                    <div class="quest-item-meta">В процессе • Прогресс 65%</div>
+                    <div class="progress-bar-mini">
+                        <div class="progress-fill-mini" style="width: 65%;"></div>
+                    </div>
+                </div>
+                <div class="quest-item-actions">
+                    <button class="btn btn-primary btn-sm"><i class="fas fa-play"></i> Продолжить</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Мои команды -->
+        <div id="teams-tab" class="tab-content">
+            <div class="quest-item">
+                <div class="quest-item-info">
+                    <div class="quest-item-title"><i class="fas fa-crown" style="color: var(--yellow);"></i> Искатели приключений</div>
+                    <div class="quest-item-meta">Капитан • Код: <span class="invite-code">X7G3K9</span> • 4 участника</div>
+                </div>
+                <div class="quest-item-actions">
+                    <button class="btn btn-outline btn-sm">Управление</button>
+                </div>
+            </div>
+            <div class="quest-item">
+                <div class="quest-item-info">
+                    <div class="quest-item-title">Ночные волки</div>
+                    <div class="quest-item-meta">Участник • 6 участников</div>
+                </div>
+                <div class="quest-item-actions">
+                    <button class="btn btn-danger btn-sm">Покинуть</button>
+                </div>
+            </div>
+            <div class="team-actions">
+                <button class="btn btn-primary" id="createTeamBtn">
+                    <i class="fas fa-plus"></i> Создать команду
+                </button>
+                <button class="btn btn-outline" id="joinTeamBtn">
+                    <i class="fas fa-link"></i> Вступить по коду
+                </button>
+            </div>
+        </div>
+        
+        <!-- Достижения -->
+        <div id="achievements-tab" class="tab-content">
+            <div class="achievement-grid">
+                <div class="achievement-card">
+                    <i class="fas fa-walking"></i>
+                    <h4>Пешеход</h4>
+                    <p>Пройдено километров</p>
+                    <div class="achievement-level">Любитель</div>
+        
+                </div>
+                <div class="achievement-card">
+                    <i class="fas fa-trophy"></i>
+                    <h4>Победитель</h4>
+                    <p>Завершённых квестов</p>
+                    <div class="achievement-level">Любитель</div>
+                   
+                </div>
+                <div class="achievement-card">
+                    <i class="fas fa-star"></i>
+                    <h4>Звёздный</h4>
+                    <p>Суммарный рейтинг</p>
+                    <div class="achievement-level">Любитель</div>
+                    
+                </div>
+                <div class="achievement-card">
+                    <i class="fas fa-compass"></i>
+                    <h4>Первопроходец</h4>
+                    <p>Уникальных районов</p>
+                    <div class="achievement-level">Новичок</div>
+                    
+                </div>
+                <div class="achievement-card">
+                    <i class="fas fa-bolt"></i>
+                    <h4>Спринтер</h4>
+                    <p>Квестов быстрее времени</p>
+                    <div class="achievement-level">Новичок</div>
+                   
+                </div>
+                <div class="achievement-card">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <h4>Мастер головоломок</h4>
+                    <p>Правильных ответов подряд</p>
+                    <div class="achievement-level">Новичок</div>
+                    
+                </div>
+                <div class="achievement-card">
+                    <i class="fas fa-map"></i>
+                    <h4>Картограф</h4>
+                    <p>Созданных квестов</p>
+                    <div class="achievement-level">Новичок</div>
+                   
+                </div>
+                <div class="achievement-card">
+                    <i class="fas fa-users"></i>
+                    <h4>Лидер</h4>
+                    <p>Максимальный размер команды</p>
+                    <div class="achievement-level">Любитель</div>
+                    
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-logo">
+                <a href="index.html" class="logo">Imprezzio:<span>Path</span></a>
+                <p>Городские квесты для активных подростков</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>О проекте</h4>
+                    <a href="#">О нас</a>
+                    <a href="#">Правила</a>
+                    <a href="#">Контакты</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Помощь</h4>
+                    <a href="#">FAQ</a>
+                    <a href="#">Поддержка</a>
+                    <a href="#">Безопасность</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Соцсети</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-vk"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Imprezzio: Path. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модальное окно создания команды -->
+    <div id="createTeamModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-users"></i> Создать команду</h3>
+                <button class="modal-close" id="closeCreateModal">&times;</button>
+            </div>
+            <form id="createTeamForm">
+                <div class="form-group">
+                    <label>Название команды</label>
+                    <input type="text" name="teamName" class="form-input" required minlength="3" maxlength="40" placeholder="Введите название">
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea name="description" class="form-textarea" rows="3" maxlength="200" placeholder="Расскажите о вашей команде..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Создать команду</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно вступления в команду -->
+    <div id="joinTeamModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-link"></i> Вступить в команду</h3>
+                <button class="modal-close" id="closeJoinModal">&times;</button>
+            </div>
+            <form id="joinTeamForm">
+                <div class="form-group">
+                    <label>Код приглашения</label>
+                    <input type="text" name="inviteCode" class="form-input" required placeholder="XXXX-XXXX" maxlength="9">
+                    <small class="input-hint">Введите 8-значный код команды</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Вступить в команду</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно редактирования профиля -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-edit"></i> Редактирование профиля</h3>
+                <button class="modal-close" id="closeEditModal">&times;</button>
+            </div>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label>Имя пользователя</label>
+                    <input type="text" name="username" class="form-input" value="Алексей Маршрутов" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-input" value="alex@imprezzio.ru" required readonly style="opacity: 0.7;">
+                </div>
+                <div class="form-group">
+                    <label>Дата рождения</label>
+                    <input type="date" name="birthdate" class="form-input" id="birthdateInput" value="2009-03-15">
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/theme-switcher.js"></script>
+    <script>
+        // Бургер-меню
+        const burgerBtn = document.getElementById('burgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        
+        function openMenu() {
+            mobileMenu.classList.add('active');
+            menuOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMenu() {
+            mobileMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        burgerBtn?.addEventListener('click', openMenu);
+        closeMenuBtn?.addEventListener('click', closeMenu);
+        menuOverlay?.addEventListener('click', closeMenu);
+        
+        // Выход из аккаунта
+        const logoutBtn = document.getElementById('logoutBtn');
+        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+        
+        function handleLogout() {
+            if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
+                window.location.href = 'auth/login.html';
+            }
+        }
+        
+        logoutBtn?.addEventListener('click', handleLogout);
+        mobileLogoutBtn?.addEventListener('click', handleLogout);
+        
+        // Переключение вкладок
+        const tabs = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                const activeTab = document.getElementById(`${tabId}-tab`);
+                if (activeTab) activeTab.classList.add('active');
+            });
+        });
+        
+        // Модальное окно редактирования профиля
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const editModal = document.getElementById('editProfileModal');
+        const closeEditModal = document.getElementById('closeEditModal');
+        const birthdateInput = document.getElementById('birthdateInput');
+        const birthdateText = document.getElementById('birthdateText');
+        
+        function formatDateToRussian(dateString) {
+            const date = new Date(dateString);
+            const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            const age = calculateAge(dateString);
+            return `${day} ${month} ${year} (${age} лет)`;
+        }
+        
+        function calculateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            return age;
+        }
+        
+        function openEditModal() {
+            editModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeEditModalFunc() {
+            editModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        editProfileBtn?.addEventListener('click', openEditModal);
+        closeEditModal?.addEventListener('click', closeEditModalFunc);
+        editModal?.addEventListener('click', (e) => {
+            if (e.target === editModal) closeEditModalFunc();
+        });
+        
+        // Сохранение данных профиля
+        document.getElementById('editProfileForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newBirthdate = birthdateInput.value;
+            if (newBirthdate) {
+                birthdateText.textContent = formatDateToRussian(newBirthdate);
+            }
+            alert('Данные профиля успешно обновлены!');
+            closeEditModalFunc();
+        });
+        
+        // Модальные окна команд
+        const createTeamBtn = document.getElementById('createTeamBtn');
+        const joinTeamBtn = document.getElementById('joinTeamBtn');
+        const createModal = document.getElementById('createTeamModal');
+        const joinModal = document.getElementById('joinTeamModal');
+        const closeCreateModal = document.getElementById('closeCreateModal');
+        const closeJoinModal = document.getElementById('closeJoinModal');
+        
+        function openCreateModal() {
+            createModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function openJoinModal() {
+            joinModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeCreateModalFunc() {
+            createModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        function closeJoinModalFunc() {
+            joinModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        createTeamBtn?.addEventListener('click', openCreateModal);
+        joinTeamBtn?.addEventListener('click', openJoinModal);
+        closeCreateModal?.addEventListener('click', closeCreateModalFunc);
+        closeJoinModal?.addEventListener('click', closeJoinModalFunc);
+        
+        createModal?.addEventListener('click', (e) => {
+            if (e.target === createModal) closeCreateModalFunc();
+        });
+        joinModal?.addEventListener('click', (e) => {
+            if (e.target === joinModal) closeJoinModalFunc();
+        });
+        
+        // Обработка форм
+        document.getElementById('createTeamForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const teamName = e.target.querySelector('input[name="teamName"]').value;
+            alert(`Команда "${teamName}" создана! Код команды: ${Math.random().toString(36).substring(2, 10).toUpperCase()}`);
+            closeCreateModalFunc();
+            e.target.reset();
+        });
+        
+        document.getElementById('joinTeamForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Вы успешно вступили в команду!');
+            closeJoinModalFunc();
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>

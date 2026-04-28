@@ -1,0 +1,15 @@
+/* Тема: Neon Sunset */
+:root {
+    --bg-dark: #0A0A0F;
+    --bg-card: #161622;
+    --bg-sidebar: #11111C;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B8B0C8;
+    --border: #2A2A3D;
+    --yellow: #FF3366;
+    --orange: #FF6633;
+    --red: #FF00FF;
+    --pink: #9933FF;
+    --glow-yellow: rgba(255, 51, 102, 0.25);
+    --glow-pink: rgba(153, 51, 255, 0.25);
+}

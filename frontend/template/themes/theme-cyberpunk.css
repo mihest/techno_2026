@@ -1,0 +1,15 @@
+/* Тема: Cyberpunk 2077 */
+:root {
+    --bg-dark: #0B0C10;
+    --bg-card: #1F1A2E;
+    --bg-sidebar: #15122B;
+    --text-primary: #FFFFFF;
+    --text-secondary: #A0A0D0;
+    --border: #3D2B56;
+    --yellow: #00FFCC;
+    --orange: #00FF88;
+    --red: #00CCFF;
+    --pink: #7000FF;
+    --glow-yellow: rgba(0, 255, 204, 0.25);
+    --glow-pink: rgba(112, 0, 255, 0.25);
+}

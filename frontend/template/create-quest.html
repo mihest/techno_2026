@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Imprezzio: Path - Создание квеста</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="themes/theme-default.css" id="themeStylesheet">
+    <style>
+        /* Дополнительные стили для страницы создания квеста */
+        .steps-container {
+            margin: 32px 0;
+        }
+        
+        .steps-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .steps-indicator::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            cursor: pointer;
+        }
+        
+        .step-circle {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-circle {
+            background: linear-gradient(135deg, var(--yellow), var(--orange));
+            border-color: transparent;
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px var(--glow-yellow);
+        }
+        
+        .step.completed .step-circle {
+            background: var(--bright-green);
+            border-color: var(--bright-green);
+            color: white;
+        }
+        
+        .step.completed .step-circle i {
+            font-size: 1.2rem;
+        }
+        
+        .step-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .step.active .step-label {
+            color: var(--yellow);
+        }
+        
+        .step-content {
+            display: none;
+            animation: fadeInUp 0.3s ease;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            background: var(--bg-card);
+            border-radius: 28px;
+            padding: 32px;
+            margin-bottom: 0;
+            border: 1px solid var(--border);
+        }
+        
+        .form-section h2 {
+            margin-bottom: 28px;
+            color: var(--yellow);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        .form-group label.required::after {
+            content: '*';
+            color: var(--red);
+            margin-left: 4px;
+        }
+        
+        .form-input, .form-textarea, .custom-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--text-primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .custom-select:focus {
+            outline: none;
+            border-color: var(--yellow);
+            box-shadow: 0 0 0 2px var(--glow-yellow);
+        }
+        
+        /* Категории как на главной странице */
+        .categories-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .category-chip {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+        
+        .category-chip:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+        
+        .category-chip.active {
+            background: var(--pink);
+            border-color: var(--pink);
+            color: white;
+        }
+        
+        /* Dropzone */
+        .dropzone {
+            border: 2px dashed var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-dark);
+        }
+        
+        .dropzone:hover, .dropzone.drag-over {
+            border-color: var(--yellow);
+            background: rgba(255, 255, 27, 0.05);
+        }
+        
+        .dropzone i {
+            font-size: 3rem;
+            color: var(--yellow);
+            margin-bottom: 12px;
+        }
+        
+        .cover-preview {
+            margin-top: 16px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .cover-preview img {
+            max-width: 200px;
+            border-radius: 16px;
+            border: 2px solid var(--yellow);
+        }
+        
+        .remove-cover {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--red);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        /* Чекпоинты */
+        .checkpoints-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        
+        .checkpoints-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .checkpoints-list::-webkit-scrollbar-track {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        
+        .checkpoints-list::-webkit-scrollbar-thumb {
+            background: var(--yellow);
+            border-radius: 10px;
+        }
+        
+        .checkpoint-card-preview {
+            background: var(--bg-dark);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .checkpoint-card-preview:hover {
+            border-color: var(--yellow);
+        }
+        
+        .empty-checkpoints {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            background: var(--bg-dark);
+            border-radius: 16px;
+        }
+        
+        .step-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            gap: 16px;
+        }
+        
+        /* Предпросмотр */
+        .preview-card {
+            background: var(--bg-dark);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        .preview-header {
+            background: var(--bg-card);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--yellow);
+        }
+        
+        .preview-content {
+            padding: 24px;
+        }
+        
+        .preview-cover-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .preview-placeholder {
+            width: 100%;
+            height: 200px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+            border: 1px dashed var(--border);
+        }
+        
+        .info-box {
+            background: rgba(0, 162, 232, 0.1);
+            border: 1px solid var(--electric-blue);
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        /* Модальное окно */
+        .modal-content {
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .modal-content::-webkit-scrollbar-track {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--yellow);
+            border-radius: 10px;
+        }
+        
+        .answer-option {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        
+        .answer-option .form-input {
+            flex: 1;
+        }
+        
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .radio-label input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--yellow);
+        }
+        
+        .coords-info {
+            background: var(--bg-dark);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        
+        #map {
+            height: 300px;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .step-actions {
+                flex-direction: column;
+            }
+            .step-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .categories-list {
+                gap: 8px;
+            }
+            .category-chip {
+                padding: 6px 12px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">Imprezzio:<span>Path</span></a>
+            <div class="nav-links">
+                <a href="index.html">Квесты</a>
+                <a href="rating.html">Рейтинг</a>
+                <a href="profile.html">Профиль</a>
+                <a href="create-quest.html" class="active">Создать</a>
+                <a href="moderation.html">Модерация</a>
+            </div>
+            <div class="header-controls">
+                <div class="theme-selector">
+                    <i class="fas fa-palette"></i>
+                    <div class="custom-select-wrapper">
+                        <select id="themeSelect" class="theme-select">
+                            <option value="default">🌈 Neon Pop</option>
+                            <option value="neon-sunset">🌅 Neon Sunset</option>
+                            <option value="cyberpunk">💀 Cyberpunk 2077</option>
+                            <option value="tropical">🍍 Tropical Juice</option>
+                            <option value="ice-flame">❄️ Ice Flame</option>
+                            <option value="space-rave">🚀 Space Rave</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </button>
+            </div>
+            <button class="burger-btn" id="burgerBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+    
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="close-menu" id="closeMenuBtn"><i class="fas fa-times"></i></button>
+        <a href="index.html">Квесты</a>
+        <a href="rating.html">Рейтинг</a>
+        <a href="profile.html">Профиль</a>
+        <a href="create-quest.html" class="active">Создать</a>
+        <a href="moderation.html">Модерация</a>
+        <div class="mobile-theme-selector">
+            <i class="fas fa-palette"></i>
+            <div class="custom-select-wrapper">
+                <select id="mobileThemeSelect" class="theme-select">
+                    <option value="default">🌈 Neon Pop</option>
+                    <option value="neon-sunset">🌅 Neon Sunset</option>
+                    <option value="cyberpunk">💀 Cyberpunk 2077</option>
+                    <option value="tropical">🍍 Tropical Juice</option>
+                    <option value="ice-flame">❄️ Ice Flame</option>
+                    <option value="space-rave">🚀 Space Rave</option>
+                </select>
+                <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+        </div>
+        <button class="logout-btn mobile-logout" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Выйти из аккаунта</span>
+        </button>
+    </div>
+
+    <main class="container">
+        <div class="steps-container">
+            <div class="steps-indicator">
+                <div class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Основная информация</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Чекпоинты</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Публикация</div>
+                </div>
+            </div>
+            
+            <!-- ШАГ 1 -->
+            <div id="step1" class="step-content active">
+                <div class="form-section">
+                    <h2><i class="fas fa-info-circle"></i> Основная информация</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">Название квеста</label>
+                            <input type="text" name="title" class="form-input" id="questTitle" placeholder="Например: Тайны старого города">
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Сложность</label>
+                            <div class="custom-select-wrapper">
+                                <select name="difficulty" id="questDifficulty" class="custom-select">
+                                    <option value="1">1 - Очень легко</option>
+                                    <option value="2">2 - Легко</option>
+                                    <option value="3">3 - Средне</option>
+                                    <option value="4">4 - Сложно</option>
+                                    <option value="5">5 - Экстрим</option>
+                                </select>
+                                <i class="fas fa-chevron-down select-arrow"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Город</label>
+                            <input type="text" name="city" class="form-input" id="questCity" placeholder="Например: Москва">
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Район</label>
+                            <input type="text" name="district" class="form-input" id="questDistrict" placeholder="Например: Арбат">
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Длительность (минут)</label>
+                            <input type="number" name="duration" class="form-input" id="questDuration" min="30" max="235" placeholder="30-235 минут">
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Возрастная категория</label>
+                            <div class="custom-select-wrapper">
+                                <select name="ageGroup" id="questAgeGroup" class="custom-select">
+                                    <option value="under14">Мне нет 14</option>
+                                    <option value="14-15">14-15 лет</option>
+                                    <option value="15-16">15-16 лет</option>
+                                    <option value="16-17">16-17 лет</option>
+                                    <option value="18plus">Мне есть 18</option>
+                                </select>
+                                <i class="fas fa-chevron-down select-arrow"></i>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="required">Категории квеста</label>
+                            <div class="categories-list" id="categoriesList"></div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="required">Обложка</label>
+                            <div class="dropzone" id="dropzone">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Перетащите изображение сюда или нажмите для выбора</p>
+                                <button type="button" class="btn btn-outline btn-sm">Выбрать файл</button>
+                                <input type="file" id="coverInput" accept="image/jpeg,image/png" style="display: none;">
+                            </div>
+                            <div id="coverPreview" class="cover-preview"></div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="required">Описание</label>
+                            <textarea name="description" class="form-textarea" id="questDescription" rows="4" placeholder="Расскажите, что ждёт участников..."></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Предупреждения</label>
+                            <textarea name="warnings" class="form-textarea" id="questWarnings" rows="2" placeholder="Важные предупреждения для участников..."></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Правила</label>
+                            <textarea name="rules" class="form-textarea" id="questRules" rows="2" placeholder="Правила прохождения квеста..."></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Что взять с собой</label>
+                            <textarea name="whatToTake" class="form-textarea" id="questWhatToTake" rows="2" placeholder="Например: вода, удобная обувь, power bank..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ШАГ 2: Чекпоинты -->
+            <div id="step2" class="step-content">
+                <div class="form-section">
+                    <h2><i class="fas fa-map-marker-alt"></i> Чекпоинты (минимум 3)</h2>
+                    <div id="checkpointsList" class="checkpoints-list">
+                        <div class="empty-checkpoints">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <p>Нет добавленных чекпоинтов</p>
+                            <p>Нажмите "Добавить чекпоинт" чтобы создать первый</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="addCheckpointBtn">
+                        <i class="fas fa-plus"></i> Добавить чекпоинт
+                    </button>
+                    <div id="checkpointError" class="alert alert-error" style="display: none; margin-top: 16px;">
+                        <i class="fas fa-exclamation-triangle"></i> Необходимо добавить минимум 3 чекпоинта
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ШАГ 3: Публикация -->
+            <div id="step3" class="step-content">
+                <div class="form-section">
+                    <h2><i class="fas fa-rocket"></i> Публикация квеста</h2>
+                    <div class="preview-card" id="previewCard"></div>
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Внимание!</strong>
+                            <p>После отправки на модерацию квест нельзя будет редактировать. Модерация занимает до 48 часов.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step-actions">
+                <button type="button" class="btn btn-outline" id="prevBtn" style="display: none;"><i class="fas fa-arrow-left"></i> Назад</button>
+                <button type="button" class="btn btn-primary" id="nextBtn">Далее <i class="fas fa-arrow-right"></i></button>
+                <button type="button" class="btn btn-primary" id="submitBtn" style="display: none;"><i class="fas fa-paper-plane"></i> Отправить на модерацию</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-logo">
+                <a href="index.html" class="logo">Imprezzio:<span>Path</span></a>
+                <p>Городские квесты для активных подростков</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>О проекте</h4>
+                    <a href="#">О нас</a>
+                    <a href="#">Правила</a>
+                    <a href="#">Контакты</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Помощь</h4>
+                    <a href="#">FAQ</a>
+                    <a href="#">Поддержка</a>
+                    <a href="#">Безопасность</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Соцсети</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-vk"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Imprezzio: Path. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модальное окно добавления чекпоинта -->
+    <div id="checkpointModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-map-pin"></i> Добавить чекпоинт</h3>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
+            <form id="checkpointForm">
+                <div class="form-group">
+                    <label>Название точки</label>
+                    <input type="text" name="title" class="form-input" required placeholder="Например: Памятник Пушкину">
+                </div>
+                <div class="form-group">
+                    <label>Задание</label>
+                    <textarea name="task" class="form-textarea" required rows="3" placeholder="Опишите задание для участников..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Тип задания</label>
+                    <div class="custom-select-wrapper">
+                        <select name="questionType" id="questionType" class="custom-select">
+                            <option value="code">Код-слово</option>
+                            <option value="choice">Вопрос с вариантами</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+                </div>
+                <div id="codeFields">
+                    <div class="form-group">
+                        <label>Правильное слово/код</label>
+                        <input type="text" name="correctCode" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Подсказки (3 штуки)</label>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <input type="text" name="hint1" class="form-input" placeholder="Подсказка 1" required style="flex:1;">
+                            <input type="text" name="hint2" class="form-input" placeholder="Подсказка 2" required style="flex:1;">
+                            <input type="text" name="hint3" class="form-input" placeholder="Подсказка 3" required style="flex:1;">
+                        </div>
+                    </div>
+                </div>
+                <div id="choiceFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Варианты ответов</label>
+                        <div id="optionsContainer">
+                            <div class="answer-option">
+                                <input type="text" name="option1" class="form-input" placeholder="Вариант 1" required>
+                                <label class="radio-label"><input type="radio" name="correctOption" value="1" required> Правильный</label>
+                            </div>
+                            <div class="answer-option">
+                                <input type="text" name="option2" class="form-input" placeholder="Вариант 2" required>
+                                <label class="radio-label"><input type="radio" name="correctOption" value="2"> Правильный</label>
+                            </div>
+                            <div class="answer-option">
+                                <input type="text" name="option3" class="form-input" placeholder="Вариант 3" required>
+                                <label class="radio-label"><input type="radio" name="correctOption" value="3"> Правильный</label>
+                            </div>
+                            <div class="answer-option">
+                                <input type="text" name="option4" class="form-input" placeholder="Вариант 4" required>
+                                <label class="radio-label"><input type="radio" name="correctOption" value="4"> Правильный</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Правила точки (необязательно)</label>
+                    <textarea name="pointRules" class="form-textarea" rows="2" placeholder="Особые правила для этой точки..."></textarea>
+                </div>
+                <div class="coords-info" id="coordsInfo">
+                    <i class="fas fa-location-dot"></i> Кликните на карте для выбора координат
+                </div>
+                <div id="map"></div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-outline" id="cancelModalBtn">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить чекпоинт</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ_api&lang=ru_RU"></script>
+    <script src="js/theme-switcher.js"></script>
+    <script>
+                // Бургер-меню и выход
+        const burgerBtn = document.getElementById('burgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+        
+        function openMenu() { mobileMenu.classList.add('active'); menuOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function closeMenu() { mobileMenu.classList.remove('active'); menuOverlay.classList.remove('active'); document.body.style.overflow = ''; }
+        burgerBtn?.addEventListener('click', openMenu);
+        closeMenuBtn?.addEventListener('click', closeMenu);
+        menuOverlay?.addEventListener('click', closeMenu);
+        
+        function handleLogout() { if (confirm('Вы уверены?')) window.location.href = 'auth/login.html'; }
+        logoutBtn?.addEventListener('click', handleLogout);
+        mobileLogoutBtn?.addEventListener('click', handleLogout);
+        
+        // Данные
+        let checkpoints = [];
+        let editingIndex = null;
+        let map = null;
+        let placemark = null;
+        let selectedCoords = [55.751574, 37.573856];
+        let coverData = null;
+        let selectedCategories = [];
+        
+        // Список категорий
+        const categoriesData = [
+            "История", "Архитектура", "Техно", "Природа", "Искусство",
+            "Еда", "Мистика", "Спорт", "Урбанистика", "Музыка",
+            "Наука", "Гастрономия", "Медиа", "Игровая индустрия", "Волонтёрство"
+        ];
+        
+        function renderCategories() {
+            const container = document.getElementById('categoriesList');
+            if (!container) return;
+            container.innerHTML = categoriesData.map(cat => `
+                <span class="category-chip" data-cat="${cat}">${cat}</span>
+            `).join('');
+            
+            document.querySelectorAll('.category-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const cat = chip.dataset.cat;
+                    const idx = selectedCategories.indexOf(cat);
+                    if (idx === -1) {
+                        selectedCategories.push(cat);
+                        chip.classList.add('active');
+                    } else {
+                        selectedCategories.splice(idx, 1);
+                        chip.classList.remove('active');
+                    }
+                    updatePreview();
+                });
+            });
+        }
+        
+        // Шаги
+        let currentStep = 1;
+        const totalSteps = 3;
+        
+        function updateStepUI() {
+            const steps = document.querySelectorAll('.step');
+            const contents = document.querySelectorAll('.step-content');
+            steps.forEach((step, idx) => {
+                const stepNum = idx + 1;
+                if (stepNum < currentStep) { step.classList.add('completed'); step.classList.remove('active'); }
+                else if (stepNum === currentStep) { step.classList.add('active'); step.classList.remove('completed'); }
+                else { step.classList.remove('active', 'completed'); }
+            });
+            contents.forEach((content, idx) => {
+                if (idx + 1 === currentStep) content.classList.add('active');
+                else content.classList.remove('active');
+            });
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            if (currentStep === 1) { prevBtn.style.display = 'none'; nextBtn.style.display = 'flex'; submitBtn.style.display = 'none'; }
+            else if (currentStep === totalSteps) { prevBtn.style.display = 'flex'; nextBtn.style.display = 'none'; submitBtn.style.display = 'flex'; }
+            else { prevBtn.style.display = 'flex'; nextBtn.style.display = 'flex'; submitBtn.style.display = 'none'; }
+        }
+        
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                if (currentStep === 1) {
+                    const title = document.getElementById('questTitle').value;
+                    if (!title) { alert('Заполните название квеста'); return; }
+                }
+                currentStep++;
+                updateStepUI();
+                updatePreview();
+            }
+        }
+        
+        function prevStep() { if (currentStep > 1) { currentStep--; updateStepUI(); } }
+        
+        document.querySelectorAll('.step').forEach(step => {
+            step.addEventListener('click', () => {
+                const stepNum = parseInt(step.dataset.step);
+                if (stepNum <= currentStep + 1) { currentStep = stepNum; updateStepUI(); updatePreview(); }
+            });
+        });
+        
+        document.getElementById('prevBtn').addEventListener('click', prevStep);
+        document.getElementById('nextBtn').addEventListener('click', nextStep);
+        
+        function getDifficultyText(level) {
+            const levels = { 1: 'Очень легко', 2: 'Легко', 3: 'Средне', 4: 'Сложно', 5: 'Экстрим' };
+            return levels[level] || 'Средне';
+        }
+        
+        function updatePreview() {
+            const title = document.getElementById('questTitle').value || 'Название квеста';
+            const city = document.getElementById('questCity').value || 'Город';
+            const district = document.getElementById('questDistrict').value || 'Район';
+            const duration = document.getElementById('questDuration').value || '0';
+            const description = document.getElementById('questDescription').value || 'Описание квеста появится здесь...';
+            const difficulty = parseInt(document.getElementById('questDifficulty').value) || 3;
+            const ageGroupSelect = document.getElementById('questAgeGroup');
+            const ageGroupText = ageGroupSelect.options[ageGroupSelect.selectedIndex]?.text || '14-15 лет';
+            const warnings = document.getElementById('questWarnings').value;
+            const rules = document.getElementById('questRules').value;
+            const whatToTake = document.getElementById('questWhatToTake').value;
+            
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += i <= difficulty ? '<i class="fas fa-star" style="color: var(--yellow);"></i>' : '<i class="fas fa-star" style="color: var(--border);"></i>';
+            }
+            
+            let coverHtml = coverData ? `<img src="${coverData}" class="preview-cover-img">` : `<div class="preview-placeholder"><i class="fas fa-image"></i> <span style="margin-left: 8px;">Нет обложки</span></div>`;
+            
+            let categoriesHtml = '';
+            if (selectedCategories.length > 0) {
+                categoriesHtml = `<div class="preview-categories" style="display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0;">${selectedCategories.map(cat => `<span style="background: rgba(255,255,27,0.15); padding:4px 12px; border-radius:20px; font-size:0.7rem; color:var(--yellow);">${cat}</span>`).join('')}</div>`;
+            }
+            
+            let checkpointsHtml = '';
+            if (checkpoints.length > 0) {
+                checkpointsHtml = `<div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border);"><strong><i class="fas fa-list"></i> Чекпоинты (${checkpoints.length}):</strong>${checkpoints.map((cp, idx) => `<div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border);"><div style="width:28px; height:28px; background:var(--bg-card); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:var(--yellow);">${idx+1}</div><div style="flex:1;">${escapeHtml(cp.title)}</div><div style="font-size:0.7rem; color:var(--text-secondary);">${cp.questionType === 'code' ? 'Код-слово' : 'Выбор ответа'}</div></div>`).join('')}</div>`;
+            } else {
+                checkpointsHtml = `<div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border);"><em style="color:var(--text-secondary);">Чекпоинты не добавлены</em></div>`;
+            }
+            
+            const previewCard = document.getElementById('previewCard');
+            if (previewCard) {
+                previewCard.innerHTML = `
+                    <div class="preview-header"><i class="fas fa-eye"></i><span>Предпросмотр квеста</span></div>
+                    <div class="preview-content">
+                        ${coverHtml}
+                        <h3>${escapeHtml(title)}</h3>
+                        <div style="display:flex; flex-wrap:wrap; gap:20px; margin-bottom:12px; font-size:0.8rem; color:var(--text-secondary);">
+                            <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(city)}, ${escapeHtml(district)}</span>
+                            <span><i class="fas fa-clock"></i> ${duration} мин</span>
+                            <span><i class="fas fa-users"></i> ${ageGroupText}</span>
+                        </div>
+                        <div style="margin-bottom:12px;">${stars} <span style="margin-left:8px; color:var(--text-secondary);">${getDifficultyText(difficulty)}</span></div>
+                        ${categoriesHtml}
+                        <p><strong>Описание:</strong> ${escapeHtml(description.substring(0, 200))}${description.length > 200 ? '...' : ''}</p>
+                        ${warnings ? `<p><strong><i class="fas fa-exclamation-triangle"></i> Предупреждения:</strong> ${escapeHtml(warnings.substring(0, 150))}</p>` : ''}
+                        ${rules ? `<p><strong><i class="fas fa-gavel"></i> Правила:</strong> ${escapeHtml(rules.substring(0, 150))}</p>` : ''}
+                        ${whatToTake ? `<p><strong><i class="fas fa-backpack"></i> Что взять:</strong> ${escapeHtml(whatToTake.substring(0, 150))}</p>` : ''}
+                        ${checkpointsHtml}
+                    </div>
+                `;
+            }
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+                return c;
+            });
+        }
+        
+        ['questTitle', 'questCity', 'questDistrict', 'questDuration', 'questDescription', 'questDifficulty', 'questAgeGroup', 'questWarnings', 'questRules', 'questWhatToTake'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', updatePreview);
+                el.addEventListener('change', updatePreview);
+            }
+        });
+        
+        // Обложка
+        const dropzone = document.getElementById('dropzone');
+        const coverInput = document.getElementById('coverInput');
+        const coverPreviewDiv = document.getElementById('coverPreview');
+        if (dropzone) {
+            dropzone.addEventListener('click', () => coverInput.click());
+            dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+            dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) handleCoverFile(file);
+            });
+        }
+        if (coverInput) {
+            coverInput.addEventListener('change', (e) => { if (e.target.files[0]) handleCoverFile(e.target.files[0]); });
+        }
+        
+        function handleCoverFile(file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                coverData = event.target.result;
+                if (coverPreviewDiv) {
+                    coverPreviewDiv.innerHTML = `<div style="position:relative; display:inline-block;"><img src="${coverData}" style="max-width:200px; border-radius:16px; border:2px solid var(--yellow);"><button type="button" class="remove-cover" id="removeCoverBtn"><i class="fas fa-times"></i></button></div>`;
+                    const removeBtn = document.getElementById('removeCoverBtn');
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', () => { coverData = null; coverPreviewDiv.innerHTML = ''; coverInput.value = ''; updatePreview(); });
+                    }
+                }
+                updatePreview();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Чекпоинты
+        function renderCheckpointsList() {
+            const container = document.getElementById('checkpointsList');
+            if (!container) return;
+            if (checkpoints.length === 0) {
+                container.innerHTML = `<div class="empty-checkpoints"><i class="fas fa-map-marker-alt"></i><p>Нет добавленных чекпоинтов</p><p>Нажмите "Добавить чекпоинт" чтобы создать первый</p></div>`;
+            } else {
+                container.innerHTML = checkpoints.map((cp, idx) => `
+                    <div class="checkpoint-card-preview">
+                        <div><strong>${idx + 1}. ${escapeHtml(cp.title)}</strong><div style="font-size:0.7rem; color:var(--text-secondary);">${cp.questionType === 'code' ? 'Код-слово' : 'Вопрос с вариантами'}</div></div>
+                        <div><button class="btn btn-outline btn-sm" onclick="window.editCheckpoint(${idx})"><i class="fas fa-pen"></i></button> <button class="btn btn-danger btn-sm" onclick="window.deleteCheckpoint(${idx})"><i class="fas fa-trash"></i></button></div>
+                    </div>
+                `).join('');
+            }
+            const errorDiv = document.getElementById('checkpointError');
+            if (errorDiv) {
+                if (checkpoints.length >= 3) errorDiv.style.display = 'none';
+                else errorDiv.style.display = 'block';
+            }
+            updatePreview();
+        }
+        
+        window.deleteCheckpoint = function(index) {
+            if (confirm('Удалить этот чекпоинт?')) { checkpoints.splice(index, 1); renderCheckpointsList(); }
+        };
+        
+        window.editCheckpoint = function(index) {
+            editingIndex = index;
+            const cp = checkpoints[index];
+            openCheckpointModal(cp.coords, cp);
+        };
+        
+        // Функции для управления required атрибутами
+        function disableChoiceRequired() {
+            const choiceInputs = ['option1', 'option2', 'option3', 'option4'];
+            choiceInputs.forEach(name => {
+                const input = document.querySelector(`#checkpointForm [name="${name}"]`);
+                if (input) input.removeAttribute('required');
+            });
+            const correctRadio = document.querySelector('#checkpointForm [name="correctOption"]');
+            if (correctRadio) correctRadio.removeAttribute('required');
+        }
+        
+        function enableChoiceRequired() {
+            const choiceInputs = ['option1', 'option2', 'option3', 'option4'];
+            choiceInputs.forEach(name => {
+                const input = document.querySelector(`#checkpointForm [name="${name}"]`);
+                if (input) input.setAttribute('required', 'required');
+            });
+            const correctRadio = document.querySelector('#checkpointForm [name="correctOption"]');
+            if (correctRadio) correctRadio.setAttribute('required', 'required');
+        }
+        
+        function disableCodeRequired() {
+            const codeInput = document.querySelector('#checkpointForm [name="correctCode"]');
+            if (codeInput) codeInput.removeAttribute('required');
+            const hintInputs = ['hint1', 'hint2', 'hint3'];
+            hintInputs.forEach(name => {
+                const input = document.querySelector(`#checkpointForm [name="${name}"]`);
+                if (input) input.removeAttribute('required');
+            });
+        }
+        
+        function enableCodeRequired() {
+            const codeInput = document.querySelector('#checkpointForm [name="correctCode"]');
+            if (codeInput) codeInput.setAttribute('required', 'required');
+            const hintInputs = ['hint1', 'hint2', 'hint3'];
+            hintInputs.forEach(name => {
+                const input = document.querySelector(`#checkpointForm [name="${name}"]`);
+                if (input) input.setAttribute('required', 'required');
+            });
+        }
+        
+        // Карта
+        function initMap() {
+            if (typeof ymaps === 'undefined') {
+                console.error('Yandex Maps API not loaded');
+                return;
+            }
+            ymaps.ready(() => {
+                map = new ymaps.Map('map', { center: selectedCoords, zoom: 14, controls: ['zoomControl', 'fullscreenControl'] });
+                placemark = new ymaps.Placemark(selectedCoords, {}, { preset: 'islands#redIcon', draggable: true });
+                placemark.events.add('dragend', () => {
+                    selectedCoords = placemark.geometry.getCoordinates();
+                    const coordsInfo = document.getElementById('coordsInfo');
+                    if (coordsInfo) coordsInfo.innerHTML = `<i class="fas fa-location-dot"></i> Координаты: ${selectedCoords[0].toFixed(6)}, ${selectedCoords[1].toFixed(6)}`;
+                });
+                map.geoObjects.add(placemark);
+                map.events.add('click', (e) => {
+                    selectedCoords = e.get('coords');
+                    placemark.geometry.setCoordinates(selectedCoords);
+                    const coordsInfo = document.getElementById('coordsInfo');
+                    if (coordsInfo) coordsInfo.innerHTML = `<i class="fas fa-location-dot"></i> Координаты: ${selectedCoords[0].toFixed(6)}, ${selectedCoords[1].toFixed(6)}`;
+                });
+            });
+        }
+        
+        const modal = document.getElementById('checkpointModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+        
+        function openCheckpointModal(coords = [55.751574, 37.573856], cpData = null) {
+            selectedCoords = coords;
+            const form = document.getElementById('checkpointForm');
+            if (form) form.reset();
+            
+            const codeFields = document.getElementById('codeFields');
+            const choiceFields = document.getElementById('choiceFields');
+            
+            // По умолчанию показываем codeFields
+            if (codeFields) codeFields.style.display = 'block';
+            if (choiceFields) choiceFields.style.display = 'none';
+            enableCodeRequired();
+            disableChoiceRequired();
+            
+            const coordsInfo = document.getElementById('coordsInfo');
+            if (coordsInfo) coordsInfo.innerHTML = `<i class="fas fa-location-dot"></i> Координаты: ${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}`;
+            
+            if (cpData && form) {
+                const titleInput = form.querySelector('[name="title"]');
+                const taskInput = form.querySelector('[name="task"]');
+                const typeSelect = form.querySelector('[name="questionType"]');
+                if (titleInput) titleInput.value = cpData.title;
+                if (taskInput) taskInput.value = cpData.task;
+                if (typeSelect) typeSelect.value = cpData.questionType;
+                
+                if (cpData.questionType === 'code') {
+                    if (codeFields) codeFields.style.display = 'block';
+                    if (choiceFields) choiceFields.style.display = 'none';
+                    enableCodeRequired();
+                    disableChoiceRequired();
+                    
+                    const correctCodeInput = form.querySelector('[name="correctCode"]');
+                    if (correctCodeInput) correctCodeInput.value = cpData.correctCode;
+                    if (cpData.hints) {
+                        const hint1 = form.querySelector('[name="hint1"]');
+                        const hint2 = form.querySelector('[name="hint2"]');
+                        const hint3 = form.querySelector('[name="hint3"]');
+                        if (hint1) hint1.value = cpData.hints[0] || '';
+                        if (hint2) hint2.value = cpData.hints[1] || '';
+                        if (hint3) hint3.value = cpData.hints[2] || '';
+                    }
+                } else {
+                    if (codeFields) codeFields.style.display = 'none';
+                    if (choiceFields) choiceFields.style.display = 'block';
+                    disableCodeRequired();
+                    enableChoiceRequired();
+                    
+                    for (let i = 0; i < cpData.options.length; i++) {
+                        const optionInput = form.querySelector(`[name="option${i+1}"]`);
+                        if (optionInput) optionInput.value = cpData.options[i];
+                    }
+                    const correctRadio = form.querySelector(`[name="correctOption"][value="${cpData.correctOption + 1}"]`);
+                    if (correctRadio) correctRadio.checked = true;
+                }
+                const pointRulesInput = form.querySelector('[name="pointRules"]');
+                if (pointRulesInput) pointRulesInput.value = cpData.pointRules || '';
+            }
+            
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+            setTimeout(() => {
+                if (!map) initMap();
+                else { map.setCenter(selectedCoords, 14); if (placemark) placemark.geometry.setCoordinates(selectedCoords); }
+            }, 100);
+        }
+        
+        function closeCheckpointModal() { 
+            if (modal) modal.classList.remove('active'); 
+            document.body.style.overflow = ''; 
+            editingIndex = null; 
+        }
+        
+        const addCheckpointBtn = document.getElementById('addCheckpointBtn');
+        if (addCheckpointBtn) {
+            addCheckpointBtn.addEventListener('click', () => { editingIndex = null; openCheckpointModal(); });
+        }
+        if (closeModalBtn) closeModalBtn.addEventListener('click', closeCheckpointModal);
+        if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeCheckpointModal);
+        if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeCheckpointModal(); });
+        
+        const questionType = document.getElementById('questionType');
+        if (questionType) {
+            questionType.addEventListener('change', (e) => {
+                const codeFields = document.getElementById('codeFields');
+                const choiceFields = document.getElementById('choiceFields');
+                if (e.target.value === 'code') {
+                    if (codeFields) codeFields.style.display = 'block';
+                    if (choiceFields) choiceFields.style.display = 'none';
+                    enableCodeRequired();
+                    disableChoiceRequired();
+                } else {
+                    if (codeFields) codeFields.style.display = 'none';
+                    if (choiceFields) choiceFields.style.display = 'block';
+                    disableCodeRequired();
+                    enableChoiceRequired();
+                }
+            });
+        }
+        
+        const checkpointForm = document.getElementById('checkpointForm');
+        if (checkpointForm) {
+            checkpointForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const formData = new FormData(checkpointForm);
+                const title = formData.get('title');
+                const task = formData.get('task');
+                const questionTypeValue = formData.get('questionType');
+                
+                if (!title || !title.trim()) {
+                    alert('Введите название чекпоинта');
+                    return;
+                }
+                if (!task || !task.trim()) {
+                    alert('Введите задание для чекпоинта');
+                    return;
+                }
+                
+                const checkpoint = {
+                    title: title.trim(),
+                    task: task.trim(),
+                    questionType: questionTypeValue,
+                    coords: selectedCoords,
+                    pointRules: formData.get('pointRules') || ''
+                };
+                
+                if (checkpoint.questionType === 'code') {
+                    const correctCode = formData.get('correctCode');
+                    if (!correctCode || !correctCode.trim()) {
+                        alert('Введите правильный код-слово');
+                        return;
+                    }
+                    checkpoint.correctCode = correctCode.trim();
+                    checkpoint.hints = [
+                        formData.get('hint1') || '',
+                        formData.get('hint2') || '',
+                        formData.get('hint3') || ''
+                    ];
+                } else {
+                    const options = [];
+                    let hasEmptyOption = false;
+                    for (let i = 1; i <= 4; i++) {
+                        const opt = formData.get(`option${i}`);
+                        if (!opt || !opt.trim()) {
+                            hasEmptyOption = true;
+                            break;
+                        }
+                        options.push(opt.trim());
+                    }
+                    if (hasEmptyOption) {
+                        alert('Заполните все варианты ответов');
+                        return;
+                    }
+                    const correctOption = formData.get('correctOption');
+                    if (!correctOption) {
+                        alert('Выберите правильный вариант ответа');
+                        return;
+                    }
+                    checkpoint.options = options;
+                    checkpoint.correctOption = parseInt(correctOption) - 1;
+                }
+                
+                if (editingIndex !== null) {
+                    checkpoints[editingIndex] = checkpoint;
+                } else {
+                    checkpoints.push(checkpoint);
+                }
+                
+                renderCheckpointsList();
+                closeCheckpointModal();
+                
+                // Очищаем форму
+                checkpointForm.reset();
+                const codeFields = document.getElementById('codeFields');
+                const choiceFields = document.getElementById('choiceFields');
+                if (codeFields) codeFields.style.display = 'block';
+                if (choiceFields) choiceFields.style.display = 'none';
+                enableCodeRequired();
+                disableChoiceRequired();
+            });
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => {
+                const titleInput = document.getElementById('questTitle');
+                if (!titleInput || !titleInput.value) { alert('Заполните название квеста'); currentStep = 1; updateStepUI(); return; }
+                if (checkpoints.length < 3) { alert('Добавьте минимум 3 чекпоинта'); currentStep = 2; updateStepUI(); return; }
+                alert('Квест успешно отправлен на модерацию! Ожидайте проверки (до 48 часов).');
+            });
+        }
+        
+        // Инициализация
+        renderCategories();
+        renderCheckpointsList();
+        updateStepUI();
+        updatePreview();
+    </script>
+</body>
+</html>

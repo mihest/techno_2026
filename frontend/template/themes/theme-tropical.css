@@ -1,0 +1,15 @@
+/* Тема: Tropical Juice */
+:root {
+    --bg-dark: #0D1B2A;
+    --bg-card: #1B2D45;
+    --bg-sidebar: #15273D;
+    --text-primary: #FFFBF0;
+    --text-secondary: #C4BFA5;
+    --border: #2A4A6E;
+    --yellow: #FFD166;
+    --orange: #FF9F1C;
+    --red: #EF476F;
+    --pink: #118AB2;
+    --glow-yellow: rgba(255, 209, 102, 0.25);
+    --glow-pink: rgba(17, 138, 178, 0.25);
+}
