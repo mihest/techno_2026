@@ -10,6 +10,8 @@ from src.accounts.models import UserRoleEnum
 
 class UserBase(BaseModel):
     username: str = Field(..., min_length=5)
+    age_group_id: uuid.UUID
+    nickname: str = Field(..., min_length=5)
 
 
 class UserCreate(UserBase):
