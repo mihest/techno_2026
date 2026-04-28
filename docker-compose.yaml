@@ -10,7 +10,7 @@ services:
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: postgres
+            POSTGRES_DB: techno_2026
         networks:
             - work
 
@@ -22,14 +22,14 @@ services:
         depends_on:
             - postgres
         environment:
-            - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=1
+            - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=999999999
             - JWT_REFRESH_TOKEN_EXPIRE_DAYS=30
 
             - POSTGRES_HOST=postgres
             - POSTGRES_PORT=5432
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=postgres
-            - POSTGRES_DB=technostrelka_2026
+            - POSTGRES_DB=techno_2026
         networks:
             - work
 
