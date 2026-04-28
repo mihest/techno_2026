@@ -2,106 +2,341 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Детали квеста — ГорКвест</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Imprezzio: Path - Детали квеста</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="themes/theme-default.css" id="themeStylesheet">
 </head>
-<body class="has-sidebar">
-<header class="app-header">
-    <a href="index.html" class="app-logo">
-        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
-        <span class="gradient-text">ГорКвест</span>
-    </a>
-    <div class="header-actions">
-        <a href="auth.html" class="btn btn-ghost btn-sm" data-auth><i class="fas fa-sign-in-alt"></i> Войти</a>
-        <a href="moderation.html" class="badge badge-warning" data-role="moderator"><i class="fas fa-shield-alt"></i> Модератор</a>
-    </div>
-</header>
-
-<main class="main-content">
-    <div class="container">
-        <div class="card animate-pop">
-            <div class="quest-card-img" style="height:200px;">
-                <i class="fas fa-mask fa-4x icon-primary"></i>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">Imprezzio:<span>Path</span></a>
+            <div class="nav-links">
+                <a href="index.html">Квесты</a>
+                <a href="rating.html">Рейтинг</a>
+                <a href="profile.html">Профиль</a>
+                <a href="create-quest.html">Создать</a>
+                <a href="moderation.html">Модерация</a>
             </div>
-            <div class="card-body">
-                <h1>Тайны Арбата</h1>
-                <div class="flex gap-8 mt-16">
-                    <span class="badge badge-primary"><i class="fas fa-user"></i> Автор: user3</span>
-                    <span class="badge badge-success"><i class="fas fa-check"></i> Опубликован</span>
-                </div>
-                <p class="mt-16">Прогулка по старинным переулкам Арбата с загадками об истории района.</p>
-                <div class="flex gap-12 flex-wrap mt-16">
-                    <span class="badge badge-primary"><i class="fas fa-star"></i> 2/5</span>
-                    <span class="badge badge-accent"><i class="fas fa-clock"></i> 45 мин</span>
-                    <span class="badge badge-success"><i class="fas fa-flag"></i> 5 чекпоинтов</span>
-                </div>
-                <div class="map-container mt-16">
-                    <div class="map-placeholder">
-                        <i class="fas fa-map fa-2x text-muted"></i>
+            <div class="header-controls">
+                <div class="theme-selector">
+                    <i class="fas fa-palette"></i>
+                    <div class="custom-select-wrapper">
+                        <select id="themeSelect" class="theme-select">
+                            <option value="default">🌈 Neon Pop</option>
+                            <option value="neon-sunset">🌅 Neon Sunset</option>
+                            <option value="cyberpunk">💀 Cyberpunk 2077</option>
+                            <option value="tropical">🍍 Tropical Juice</option>
+                            <option value="ice-flame">❄️ Ice Flame</option>
+                            <option value="space-rave">🚀 Space Rave</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
                     </div>
                 </div>
-                <h3 class="mt-16"><i class="fas fa-list-ol"></i> Чекпоинты</h3>
-                <div class="checkpoint-item"><span class="checkpoint-number">1</span><div>Старт у театра Вахтангова</div></div>
-                <div class="checkpoint-item"><span class="checkpoint-number">2</span><div>Стена Цоя</div></div>
-                <div class="checkpoint-item"><span class="checkpoint-number">3</span><div>Дом с привидениями</div></div>
-                <button class="btn btn-accent btn-block btn-lg mt-16" onclick="location.href='quest-session.html'">
-                    <i class="fas fa-play"></i> Начать квест
-                </button>
-                <button class="btn btn-ghost btn-block text-danger mt-16" onclick="openModal(reportForm())">
-                    <i class="fas fa-flag"></i> Пожаловаться
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
                 </button>
             </div>
+            <button class="burger-btn" id="burgerBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+    
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="close-menu" id="closeMenuBtn"><i class="fas fa-times"></i></button>
+        <a href="index.html">Квесты</a>
+        <a href="rating.html">Рейтинг</a>
+        <a href="profile.html">Профиль</a>
+        <a href="create-quest.html">Создать</a>
+        <a href="moderation.html">Модерация</a>
+        <div class="mobile-theme-selector">
+            <i class="fas fa-palette"></i>
+            <div class="custom-select-wrapper">
+                <select id="mobileThemeSelect" class="theme-select">
+                    <option value="default">🌈 Neon Pop</option>
+                    <option value="neon-sunset">🌅 Neon Sunset</option>
+                    <option value="cyberpunk">💀 Cyberpunk 2077</option>
+                    <option value="tropical">🍍 Tropical Juice</option>
+                    <option value="ice-flame">❄️ Ice Flame</option>
+                    <option value="space-rave">🚀 Space Rave</option>
+                </select>
+                <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+        </div>
+        <button class="logout-btn mobile-logout" id="mobileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Выйти из аккаунта</span>
+        </button>
+    </div>
+
+    <main class="container">
+        <div id="questDetail"></div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-logo">
+                <a href="index.html" class="logo">Imprezzio:<span>Path</span></a>
+                <p>Городские квесты для активных подростков</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>О проекте</h4>
+                    <a href="#">О нас</a>
+                    <a href="#">Правила</a>
+                    <a href="#">Контакты</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Помощь</h4>
+                    <a href="#">FAQ</a>
+                    <a href="#">Поддержка</a>
+                    <a href="#">Безопасность</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Соцсети</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-vk"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Imprezzio: Path. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модальное окно жалобы -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-flag"></i> Пожаловаться на квест</h3>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
+            <form id="reportForm">
+                <div class="form-group">
+                    <label>Причина жалобы</label>
+                    <div class="custom-select-wrapper">
+                        <select name="reason" class="custom-select" required>
+                            <option value="">Выберите причину</option>
+                            <option value="wrong">Неверная информация</option>
+                            <option value="offensive">Оскорбительное содержание</option>
+                            <option value="dangerous">Опасный маршрут</option>
+                            <option value="broken">Неработающие чекпоинты</option>
+                            <option value="other">Другое</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Подробное описание</label>
+                    <div class="custom-select-wrapper">
+                        <textarea class="custom-select" name="description" rows="4" required minlength="20" placeholder="Опишите проблему подробно..."></textarea>
+                    </div>
+                
+                </div>
+                <button type="submit" class="btn btn-primary">Отправить жалобу</button>
+            </form>
         </div>
     </div>
-</main>
 
-<nav class="tab-bar">
-    <a href="index.html" class="tab-bar-item"><i class="fas fa-map"></i><span>Карта</span></a>
-    <a href="quests.html" class="tab-bar-item active"><i class="fas fa-list-ul"></i><span>Квесты</span></a>
-    <a href="teams.html" class="tab-bar-item"><i class="fas fa-users"></i><span>Команды</span></a>
-    <a href="rating.html" class="tab-bar-item"><i class="fas fa-trophy"></i><span>Рейтинг</span></a>
-    <a href="profile.html" class="tab-bar-item"><i class="fas fa-user"></i><span>Профиль</span></a>
-</nav>
-
-<aside class="sidebar">
-    <a href="index.html" class="app-logo">
-        <span class="logo-icon"><i class="fas fa-map-location-dot"></i></span>
-        <span class="gradient-text">ГорКвест</span>
-    </a>
-    <nav class="sidebar-nav">
-        <a href="index.html"><i class="fas fa-map"></i> Карта</a>
-        <a href="quests.html" class="active"><i class="fas fa-list-ul"></i> Лента квестов</a>
-        <a href="teams.html"><i class="fas fa-users"></i> Команды</a>
-        <a href="rating.html"><i class="fas fa-trophy"></i> Рейтинг</a>
-        <a href="profile.html"><i class="fas fa-user"></i> Профиль</a>
-        <a href="achievements.html"><i class="fas fa-medal"></i> Достижения</a>
-        <a href="create-quest.html"><i class="fas fa-plus-circle"></i> Создать квест</a>
-        <hr style="border-color:var(--border-light);margin:8px 0;">
-        <a href="moderation.html" data-role="moderator" class="hidden"><i class="fas fa-shield-alt"></i> Модерация</a>
-    </nav>
-</aside>
-
-<script src="app.js"></script>
-<script>
-    function reportForm() {
-        return `<h3 class="modal-title"><i class="fas fa-flag"></i> Жалоба на квест</h3>
-        <form onsubmit="event.preventDefault(); closeModal(); showToast('Жалоба отправлена','success');">
-          <div class="form-group">
-            <select class="form-select">
-              <option>Опасный маршрут</option>
-              <option>Спам</option>
-              <option>Оскорбительный контент</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <textarea class="form-textarea" placeholder="Комментарий"></textarea>
-          </div>
-          <button class="btn btn-danger btn-block">Отправить</button>
-        </form>`;
-    }
-</script>
+    <script src="js/theme-switcher.js"></script>
+    <script>
+        // Бургер-меню
+        const burgerBtn = document.getElementById('burgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        
+        function openMenu() {
+            mobileMenu.classList.add('active');
+            menuOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMenu() {
+            mobileMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        burgerBtn?.addEventListener('click', openMenu);
+        closeMenuBtn?.addEventListener('click', closeMenu);
+        menuOverlay?.addEventListener('click', closeMenu);
+        
+        // Выход из аккаунта
+        const logoutBtn = document.getElementById('logoutBtn');
+        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+        
+        function handleLogout() {
+            if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
+                window.location.href = 'auth/login.html';
+            }
+        }
+        
+        logoutBtn?.addEventListener('click', handleLogout);
+        mobileLogoutBtn?.addEventListener('click', handleLogout);
+        
+        // Модальное окно жалобы
+        const reportModal = document.getElementById('reportModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        
+        window.showReportModal = function() {
+            reportModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeReportModal() {
+            reportModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', closeReportModal);
+        }
+        
+        if (reportModal) {
+            reportModal.addEventListener('click', (e) => {
+                if (e.target === reportModal) closeReportModal();
+            });
+        }
+        
+        // Данные квеста
+        const urlParams = new URLSearchParams(window.location.search);
+        const questId = parseInt(urlParams.get('id')) || 1;
+        
+        const questDetailData = {
+            id: questId,
+            title: "Тайны Старого Арбата",
+            description: "Увлекательный квест по историческим переулкам Арбата. Вам предстоит найти тайные знаки, разгадать загадки прошлого и узнать интересные факты о знаменитых жителях этого района. Маршрут проходит через самые живописные места, включая легендарные дворики и памятники архитектуры.",
+            cover: "https://picsum.photos/id/104/1200/500",
+            district: "Арбат",
+            city: "Москва",
+            difficulty: 3,
+            duration: 90,
+            checkpoints: 5,
+            ageGroup: "15-16",
+            rules: "1. Следуйте указаниям карты\n2. На каждом чекпоинте отвечайте на вопросы\n3. Используйте подсказки только в крайнем случае\n4. Соблюдайте правила дорожного движения\n5. Уважайте местных жителей",
+            warnings: "Будьте внимательны на пешеходных переходах! Возьмите с собой воду и заряженный телефон. В некоторых местах может не работать мобильный интернет.",
+            whatToTake: "• Заряженный смартфон\n• Наушники\n• Бутылка воды\n• Удобная обувь\n• Зарядное устройство (power bank)"
+        };
+        
+        function getDifficultyStars(difficulty) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += i <= difficulty ? '<i class="fas fa-star star-active"></i>' : '<i class="fas fa-star star-inactive"></i>';
+            }
+            return stars;
+        }
+        
+        function getDifficultyLevel(difficulty) {
+            if (difficulty <= 2) return 'Мне только спросить';
+            if (difficulty === 3) return 'Я бы ещё поиграл';
+            return 'Работают профи';
+        }
+        
+        function renderQuestDetail() {
+            const container = document.getElementById('questDetail');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="quest-detail-wrapper">
+                    <div class="quest-hero">
+                        <div class="quest-hero-cover" style="background-image: url('${questDetailData.cover}');">
+                            <div class="quest-hero-overlay"></div>
+                        </div>
+                        <div class="quest-hero-content">
+                            <h1 class="quest-detail-title">${questDetailData.title}</h1>
+                            <div class="quest-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${questDetailData.district}, ${questDetailData.city}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="quest-content-grid">
+                        <div class="quest-main-info">
+                            <div class="info-cards-row">
+                                <div class="info-chip">
+                                    <div class="difficulty-stars">${getDifficultyStars(questDetailData.difficulty)}</div>
+                                    <span>${getDifficultyLevel(questDetailData.difficulty)}</span>
+                                </div>
+                                <div class="info-chip">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${questDetailData.duration} минут</span>
+                                </div>
+                                <div class="info-chip">
+                                    <i class="fas fa-route"></i>
+                                    <span>${questDetailData.checkpoints} точек</span>
+                                </div>
+                                <div class="info-chip">
+                                    <i class="fas fa-users"></i>
+                                    <span>${questDetailData.ageGroup} лет</span>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-block">
+                                <h3><i class="fas fa-book-open"></i> Описание</h3>
+                                <p>${questDetailData.description}</p>
+                            </div>
+                            
+                            <div class="detail-block">
+                                <h3><i class="fas fa-gavel"></i> Правила</h3>
+                                <div class="content-box">${questDetailData.rules.replace(/\n/g, '<br>')}</div>
+                            </div>
+                            
+                            <div class="detail-block">
+                                <h3><i class="fas fa-exclamation-triangle"></i> Важные предупреждения</h3>
+                                <div class="alert alert-warning">${questDetailData.warnings}</div>
+                            </div>
+                            
+                            <div class="detail-block">
+                                <h3><i class="fas fa-backpack"></i> Что взять с собой</h3>
+                                <div class="content-box">${questDetailData.whatToTake.replace(/\n/g, '<br>')}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="quest-sidebar">
+                            <div class="action-card">
+                                <div class="action-card-icon">
+                                    <i class="fas fa-face-grin-stars"></i>
+                                </div>
+                                <h4>Готов к приключению?</h4>
+                                <p>Нажми на кнопку и начни прохождение квеста прямо сейчас!</p>
+                                <button class="btn btn-primary" onclick="startQuest()">
+                                    <i class="fas fa-play"></i> Начать квест
+                                </button>
+                                <button class="btn btn-outline" onclick="showReportModal()">
+                                    <i class="fas fa-flag"></i> Пожаловаться
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function startQuest() {
+            window.location.href = `quest-play.html?id=${questDetailData.id}`;
+        }
+        
+        const reportForm = document.getElementById('reportForm');
+        if (reportForm) {
+            reportForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Жалоба отправлена модератору. Спасибо за бдительность!');
+                closeReportModal();
+                reportForm.reset();
+            });
+        }
+        
+        renderQuestDetail();
+    </script>
 </body>
 </html>

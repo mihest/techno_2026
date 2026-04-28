@@ -1,0 +1,15 @@
+/* Тема: Space Rave */
+:root {
+    --bg-dark: #040414;
+    --bg-card: #0E0E2A;
+    --bg-sidebar: #0A0A22;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B8B8FF;
+    --border: #1A1A50;
+    --yellow: #00FF87;
+    --orange: #60EFFF;
+    --red: #FF007F;
+    --pink: #7F00FF;
+    --glow-yellow: rgba(0, 255, 135, 0.25);
+    --glow-pink: rgba(127, 0, 255, 0.25);
+}

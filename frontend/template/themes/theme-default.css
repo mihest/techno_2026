@@ -1,0 +1,15 @@
+/* Тема: Neon Pop (по умолчанию) */
+:root {
+    --bg-dark: #0D0716;
+    --bg-card: #1A1128;
+    --bg-sidebar: #130C1F;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B8B0D4;
+    --border: #2A1F3D;
+    --yellow: #FFFF1B;
+    --orange: #FF8000;
+    --red: #ED1C24;
+    --pink: #F602F9;
+    --glow-yellow: rgba(255, 255, 27, 0.25);
+    --glow-pink: rgba(246, 2, 249, 0.25);
+}

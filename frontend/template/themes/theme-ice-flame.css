@@ -1,0 +1,15 @@
+/* Тема: Ice Flame */
+:root {
+    --bg-dark: #0A0E17;
+    --bg-card: #121B2D;
+    --bg-sidebar: #0E1625;
+    --text-primary: #FFFFFF;
+    --text-secondary: #8AA0B5;
+    --border: #1E2E45;
+    --yellow: #FFA500;
+    --orange: #FF4500;
+    --red: #4169E1;
+    --pink: #1E90FF;
+    --glow-yellow: rgba(255, 165, 0, 0.25);
+    --glow-pink: rgba(30, 144, 255, 0.25);
+}
