@@ -16,7 +16,7 @@ async def get_teams(
         session: SessionDep,
         user: UserModel = Depends(get_current_user),
 ):
-    return await TeamService.get_list(session, user)
+    return await TeamService.get(session, user)
 
 
 @router.post("/join")

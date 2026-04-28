@@ -3,6 +3,7 @@ from typing import Optional, Union, Dict, Any
 from fastapi import HTTPException
 from sqlalchemy import select, insert
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.exceptions import DatabaseException, UnknownDatabaseException
 
@@ -36,6 +37,20 @@ class TeamDAO(BaseDAO[TeamModel, TeamCreateDB, None]):
         )
         result = await session.execute(stmt)
         return result.scalars().all()
+
+    @classmethod
+    async def find_one_or_none(
+            cls,
+            session: AsyncSession,
+            *filters,
+            **filter_by
+    ) -> Optional[TeamModel]:
+        stmt = select(cls.model).filter(*filters).filter_by(**filter_by).options(
+                selectinload(cls.model.team_members)
+                .selectinload(TeamMemberModel.user)
+            )
+        result = await session.execute(stmt)
+        return result.scalars().one_or_none()
 
     @classmethod
     async def add(

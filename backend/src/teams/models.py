@@ -45,6 +45,6 @@ class TeamModel(Base):
     )
 
     owner: Mapped["UserModel"] = relationship("UserModel", back_populates="owner_teams")
-    team_members: Mapped["TeamMemberModel"] = relationship("TeamMemberModel", back_populates="team", uselist=True)
+    team_members: Mapped[list["TeamMemberModel"]] = relationship("TeamMemberModel", back_populates="team")
 
 
