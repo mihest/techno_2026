@@ -456,11 +456,21 @@
     function renderUserLocation() {
         if (!userLocationCoords || !checkpointMap || !window.ymaps) return;
 
+        const userLocationLayout = ymaps.templateLayoutFactory.createClass(
+            '<div class="user-location-marker" aria-hidden="true"></div>'
+        );
+
         checkpointMap.geoObjects.add(new ymaps.Placemark(userLocationCoords, {
             hintContent: 'Вы здесь',
             balloonContent: `<strong>Вы здесь</strong><br>${formatCoords(userLocationCoords)}`,
         }, {
-            preset: 'islands#blueCircleDotIcon',
+            iconLayout: userLocationLayout,
+            iconShape: {
+                type: 'Circle',
+                coordinates: [0, 0],
+                radius: 14,
+            },
+            zIndex: 1000,
         }));
     }
 
