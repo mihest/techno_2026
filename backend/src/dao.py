@@ -3,6 +3,7 @@ from typing import Generic, TypeVar, Optional, Union, Dict, Any
 from pydantic import BaseModel
 from sqlalchemy import select, insert, delete, update, func
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.exceptions import DatabaseException, UnknownDatabaseException
 from src.models import Base

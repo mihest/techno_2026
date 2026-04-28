@@ -12,8 +12,8 @@ from src.teams.schemas import TeamCreate, TeamCreateDB
 
 class TeamService:
     @classmethod
-    async def get_list(cls, session: AsyncSession, user: UserModel):
-        return await TeamDAO.find_all(session, TeamMemberModel.user_id == user.id)
+    async def get(cls, session: AsyncSession, user: UserModel):
+        return await TeamDAO.find_one_or_none(session, TeamMemberModel.user_id == user.id)
 
     @classmethod
     async def join_team(cls, session: AsyncSession, user: UserModel, code: str):
