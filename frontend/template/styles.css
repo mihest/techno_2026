@@ -183,6 +183,42 @@ h3 { font-size: 1.1rem; }
 /* Карта */
 .map-container { width: 100%; height: 350px; border-radius: var(--radius-lg); overflow: hidden; background: var(--surface-alt); }
 .map-container.fullscreen { height: calc(100vh - var(--header-height) - var(--tab-height) - 40px); border-radius: 0; }
+.quest-map-panel {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--surface-alt);
+}
+.quest-checkpoints-map {
+    height: 320px;
+    border-radius: 0;
+}
+.checkpoint-map-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px;
+    border-top: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.checkpoint-map-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+@media (max-width: 520px) {
+    .checkpoint-map-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .checkpoint-map-actions .btn {
+        flex: 1;
+    }
+}
 @media (min-width: 1024px) {
     .map-container.fullscreen { height: calc(100vh - var(--header-height)); }
 }
@@ -272,9 +308,50 @@ h3 { font-size: 1.1rem; }
 /* Чекпоинты */
 .checkpoint-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: var(--surface-alt); border-radius: var(--radius); margin-bottom: 8px; transition: var(--transition); cursor: pointer; }
 .checkpoint-item:hover { background: var(--border); }
+.checkpoint-item.active {
+    background: rgba(168,85,247,0.14);
+    box-shadow: inset 0 0 0 2px var(--primary);
+}
+.checkpoint-empty {
+    padding: 18px;
+    border: 1px dashed var(--border-light);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+    background: var(--surface-alt);
+}
 .checkpoint-number { width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
 .checkpoint-number.completed { background: var(--success); }
 .checkpoint-number.current { background: var(--accent); animation: pulse 2s infinite; }
+.checkpoint-address[readonly] {
+    color: var(--text-secondary);
+    cursor: default;
+}
+.checkpoint-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+}
+.checkpoint-coords {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+.checkpoint-pick {
+    flex-shrink: 0;
+}
+@media (max-width: 520px) {
+    .checkpoint-meta {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .checkpoint-pick {
+        width: 100%;
+    }
+}
 
 /* Сессия */
 .session-answer-area { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); }

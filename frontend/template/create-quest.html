@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=6b2b42a0-28a0-4e74-9f1b-7b685c9fd6cb&lang=ru_RU"></script>
 </head>
 <body class="has-sidebar">
 <header class="app-header">
@@ -62,32 +63,23 @@
             <div class="card">
                 <div class="card-body">
                     <h3>Шаг 2 — Чекпоинты</h3>
-                    <div class="map-container mb-16">
-                        <div class="map-placeholder">
-                            <i class="fas fa-map-marker-alt fa-2x text-muted"></i>
+                    <div class="quest-map-panel mb-16">
+                        <div class="map-container quest-checkpoints-map" id="checkpointMap"></div>
+                        <div class="checkpoint-map-toolbar">
+                            <span id="checkpointMapStatus"><i class="fas fa-location-dot"></i> Добавьте чекпоинт</span>
+                            <div class="checkpoint-map-actions">
+                                <button class="btn btn-ghost btn-sm" type="button" onclick="locateUserOnCheckpointMap()">
+                                    <i class="fas fa-location-crosshairs"></i> Я здесь
+                                </button>
+                                <button class="btn btn-ghost btn-sm" type="button" onclick="centerCheckpointMap()">
+                                    <i class="fas fa-crosshairs"></i> Центр
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div id="checkpointsContainer">
-                        <div class="checkpoint-item">
-                            <span class="checkpoint-number">1</span>
-                            <div class="flex-1">
-                                <input class="form-input" placeholder="Название точки">
-                                <input class="form-input mt-16" placeholder="Задание (мин. 20 символов)">
-                            </div>
-                        </div>
-                        <div class="checkpoint-item">
-                            <span class="checkpoint-number">2</span>
-                            <div class="flex-1">
-                                <input class="form-input" placeholder="Название точки">
-                                <input class="form-input mt-16" placeholder="Задание (мин. 20 символов)">
-                            </div>
-                        </div>
-                        <div class="checkpoint-item">
-                            <span class="checkpoint-number">3</span>
-                            <div class="flex-1">
-                                <input class="form-input" placeholder="Название точки">
-                                <input class="form-input mt-16" placeholder="Задание (мин. 20 символов)">
-                            </div>
+                        <div class="checkpoint-empty" id="checkpointEmpty">
+                            Нажмите «Добавить точку» или кликните по карте, чтобы поставить первый чекпоинт.
                         </div>
                     </div>
                     <button class="btn btn-ghost btn-sm mt-16" onclick="addCheckpoint()">
@@ -155,11 +147,22 @@
 <script src="app.js"></script>
 <script>
     let currentStep = 1;
+    let checkpointMap = null;
+    let activeCheckpointIndex = 0;
+    let userLocationCoords = null;
+    let hasRequestedUserLocation = false;
+
+    const defaultMapCenter = [55.751244, 37.618423];
+
     window.nextStep = function(step) {
         document.getElementById('step1').classList.toggle('hidden', step !== 1);
         document.getElementById('step2').classList.toggle('hidden', step !== 2);
         document.getElementById('step3').classList.toggle('hidden', step !== 3);
         document.getElementById('progressBar').style.width = (step * 33.33) + '%';
+        currentStep = step;
+        if (step === 2) {
+            initCheckpointMap();
+        }
         if (step === 3) {
             document.getElementById('previewTitle').textContent = document.getElementById('qTitle').value || 'Название';
             document.getElementById('previewDistrict').textContent = document.getElementById('qDistrict').value || '—';
@@ -168,18 +171,313 @@
             document.getElementById('previewCP').textContent = document.querySelectorAll('#checkpointsContainer .checkpoint-item').length;
         }
     };
-    window.addCheckpoint = function() {
+    window.addCheckpoint = function(initialCoords = null) {
         const container = document.getElementById('checkpointsContainer');
-        const num = container.children.length + 1;
+        const num = getCheckpointItems().length + 1;
+        const coords = Array.isArray(initialCoords) ? initialCoords : getDefaultCheckpointCoords(num - 1);
         const div = document.createElement('div');
         div.className = 'checkpoint-item';
+        div.dataset.checkpointItem = '';
+        div.dataset.lat = coords[0].toFixed(6);
+        div.dataset.lng = coords[1].toFixed(6);
         div.innerHTML = `<span class="checkpoint-number">${num}</span>
         <div class="flex-1">
-          <input class="form-input" placeholder="Название точки">
+          <input class="form-input checkpoint-title" placeholder="Название точки">
           <input class="form-input mt-16" placeholder="Задание (мин. 20 символов)">
+          <input class="form-input mt-16 checkpoint-address" placeholder="Адрес определится по точке на карте" readonly>
+          <div class="checkpoint-meta">
+            <span class="checkpoint-coords">${formatCoords(coords)}</span>
+            <button class="btn btn-ghost btn-sm checkpoint-pick" type="button">Выбрать</button>
+          </div>
         </div>`;
         container.appendChild(div);
+        selectCheckpoint(num - 1, true);
+        resolveCheckpointAddress(num - 1, coords);
+        renderCheckpointMap();
     };
+
+    window.centerCheckpointMap = function() {
+        if (!checkpointMap) return;
+        const coords = getCheckpointItems().map((_, index) => getCheckpointCoords(index));
+        if (coords.length > 1) {
+            checkpointMap.setBounds(ymaps.util.bounds.fromPoints(coords), {
+                checkZoomRange: true,
+                zoomMargin: 48,
+            });
+            return;
+        }
+        checkpointMap.setCenter(coords[0] || userLocationCoords || defaultMapCenter, coords[0] || userLocationCoords ? 15 : 14);
+    };
+
+    window.locateUserOnCheckpointMap = function(centerMap = true) {
+        if (!checkpointMap || !navigator.geolocation) {
+            showToast('Геолокация недоступна в этом браузере', 'error');
+            return;
+        }
+
+        const status = document.getElementById('checkpointMapStatus');
+        if (status) {
+            status.innerHTML = '<i class="fas fa-location-crosshairs"></i> Определяем местоположение...';
+        }
+
+        navigator.geolocation.getCurrentPosition((position) => {
+            userLocationCoords = [
+                position.coords.latitude,
+                position.coords.longitude,
+            ];
+
+            renderCheckpointMap();
+            if (centerMap) {
+                checkpointMap.setCenter(userLocationCoords, 16, { duration: 300 });
+            }
+            selectCheckpoint(activeCheckpointIndex);
+        }, () => {
+            selectCheckpoint(activeCheckpointIndex);
+            showToast('Не удалось получить GPS. Проверьте разрешение геолокации', 'error');
+        }, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 30000,
+        });
+    };
+
+    function initCheckpointMap() {
+        if (!window.ymaps || !document.getElementById('checkpointMap')) {
+            return;
+        }
+
+        ymaps.ready(() => {
+            if (!checkpointMap) {
+                checkpointMap = new ymaps.Map('checkpointMap', {
+                    center: defaultMapCenter,
+                    zoom: 14,
+                    controls: ['zoomControl', 'geolocationControl'],
+                });
+
+                checkpointMap.events.add('click', (event) => {
+                    const coords = event.get('coords');
+                    if (!getCheckpointItems().length) {
+                        addCheckpoint(coords);
+                        return;
+                    }
+                    setCheckpointCoords(activeCheckpointIndex, coords);
+                });
+            }
+
+            renderCheckpointMap();
+            resolveMissingCheckpointAddresses();
+            setTimeout(() => {
+                checkpointMap.container.fitToViewport();
+                if (!hasRequestedUserLocation) {
+                    hasRequestedUserLocation = true;
+                    locateUserOnCheckpointMap(true);
+                } else {
+                    centerCheckpointMap();
+                }
+            }, 0);
+        });
+    }
+
+    function getCheckpointItems() {
+        return Array.from(document.querySelectorAll('#checkpointsContainer .checkpoint-item'));
+    }
+
+    function updateCheckpointEmptyState() {
+        const empty = document.getElementById('checkpointEmpty');
+        if (empty) {
+            empty.classList.toggle('hidden', getCheckpointItems().length > 0);
+        }
+    }
+
+    function getDefaultCheckpointCoords(index) {
+        const center = checkpointMap ? checkpointMap.getCenter() : null;
+        const base = center || userLocationCoords || defaultMapCenter;
+        return [
+            base[0] + index * 0.0008,
+            base[1] + index * 0.0008,
+        ];
+    }
+
+    function getCheckpointCoords(index) {
+        const item = getCheckpointItems()[index];
+        if (!item) return userLocationCoords || defaultMapCenter;
+
+        const lat = Number(item.dataset.lat);
+        const lng = Number(item.dataset.lng);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+            return [lat, lng];
+        }
+
+        const coords = getDefaultCheckpointCoords(index);
+        item.dataset.lat = coords[0].toFixed(6);
+        item.dataset.lng = coords[1].toFixed(6);
+        updateCheckpointCoordsLabel(item, coords);
+        return coords;
+    }
+
+    function setCheckpointCoords(index, coords, resolveAddress = true) {
+        const item = getCheckpointItems()[index];
+        if (!item) return;
+
+        item.dataset.lat = coords[0].toFixed(6);
+        item.dataset.lng = coords[1].toFixed(6);
+        updateCheckpointCoordsLabel(item, coords);
+        if (resolveAddress) {
+            resolveCheckpointAddress(index, coords);
+        }
+        renderCheckpointMap();
+    }
+
+    function updateCheckpointCoordsLabel(item, coords) {
+        const label = item.querySelector('.checkpoint-coords');
+        if (label) {
+            label.textContent = formatCoords(coords);
+        }
+    }
+
+    function formatCoords(coords) {
+        return `${Number(coords[0]).toFixed(6)}, ${Number(coords[1]).toFixed(6)}`;
+    }
+
+    function resolveMissingCheckpointAddresses() {
+        getCheckpointItems().forEach((item, index) => {
+            const input = item.querySelector('.checkpoint-address');
+            if (input && !input.value.trim()) {
+                resolveCheckpointAddress(index, getCheckpointCoords(index));
+            }
+        });
+    }
+
+    function resolveCheckpointAddress(index, coords) {
+        const item = getCheckpointItems()[index];
+        const input = item?.querySelector('.checkpoint-address');
+        if (!item || !input || !window.ymaps?.geocode) {
+            return;
+        }
+
+        const requestId = `${Date.now()}-${Math.random()}`;
+        item.dataset.addressRequest = requestId;
+        input.value = 'Определяем адрес...';
+
+        ymaps.geocode(coords).then((result) => {
+            if (item.dataset.addressRequest !== requestId) return;
+
+            const firstResult = result.geoObjects.get(0);
+            const address = firstResult ? firstResult.getAddressLine() : 'Адрес не найден';
+            item.dataset.address = address;
+            input.value = address;
+            renderCheckpointMap();
+        }, () => {
+            if (item.dataset.addressRequest !== requestId) return;
+
+            item.dataset.address = '';
+            input.value = 'Адрес не найден';
+            renderCheckpointMap();
+        });
+    }
+
+    function escapeHtml(value) {
+        return String(value)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function selectCheckpoint(index, focusMap = false) {
+        const items = getCheckpointItems();
+        if (!items.length) {
+            activeCheckpointIndex = 0;
+            const status = document.getElementById('checkpointMapStatus');
+            if (status) {
+                status.innerHTML = '<i class="fas fa-location-dot"></i> Добавьте чекпоинт';
+            }
+            updateCheckpointEmptyState();
+            renderCheckpointMap();
+            return;
+        }
+
+        activeCheckpointIndex = Math.max(0, Math.min(index, items.length - 1));
+
+        items.forEach((item, itemIndex) => {
+            item.classList.toggle('active', itemIndex === activeCheckpointIndex);
+        });
+
+        const status = document.getElementById('checkpointMapStatus');
+        if (status) {
+            status.innerHTML = `<i class="fas fa-location-dot"></i> Чекпоинт ${activeCheckpointIndex + 1}`;
+        }
+
+        if (focusMap && checkpointMap) {
+            checkpointMap.setCenter(getCheckpointCoords(activeCheckpointIndex), Math.max(checkpointMap.getZoom(), 14), {
+                duration: 250,
+            });
+        }
+
+        renderCheckpointMap();
+    }
+
+    function renderCheckpointMap() {
+        if (!checkpointMap || !window.ymaps) return;
+
+        checkpointMap.geoObjects.removeAll();
+
+        const items = getCheckpointItems();
+        updateCheckpointEmptyState();
+
+        items.forEach((item, index) => {
+            const coords = getCheckpointCoords(index);
+            const title = item.querySelector('.checkpoint-title')?.value.trim() || `Чекпоинт ${index + 1}`;
+            const address = item.querySelector('.checkpoint-address')?.value.trim();
+            const addressLine = address ? `<br>${escapeHtml(address)}` : '';
+            const placemark = new ymaps.Placemark(coords, {
+                iconContent: String(index + 1),
+                hintContent: title,
+                balloonContent: `<strong>${escapeHtml(title)}</strong>${addressLine}<br>${formatCoords(coords)}`,
+            }, {
+                draggable: true,
+                preset: index === activeCheckpointIndex ? 'islands#orangeStretchyIcon' : 'islands#violetStretchyIcon',
+            });
+
+            placemark.events.add('click', () => selectCheckpoint(index));
+            placemark.events.add('dragend', () => {
+                const coords = placemark.geometry.getCoordinates();
+                setCheckpointCoords(index, coords);
+                selectCheckpoint(index);
+            });
+
+            checkpointMap.geoObjects.add(placemark);
+        });
+
+        renderUserLocation();
+    }
+
+    function renderUserLocation() {
+        if (!userLocationCoords || !checkpointMap || !window.ymaps) return;
+
+        checkpointMap.geoObjects.add(new ymaps.Placemark(userLocationCoords, {
+            hintContent: 'Вы здесь',
+            balloonContent: `<strong>Вы здесь</strong><br>${formatCoords(userLocationCoords)}`,
+        }, {
+            preset: 'islands#blueCircleDotIcon',
+        }));
+    }
+
+    document.getElementById('checkpointsContainer').addEventListener('click', (event) => {
+        const item = event.target.closest('.checkpoint-item');
+        if (!item) return;
+
+        const index = getCheckpointItems().indexOf(item);
+        selectCheckpoint(index, Boolean(event.target.closest('.checkpoint-pick')));
+    });
+
+    document.getElementById('checkpointsContainer').addEventListener('input', (event) => {
+        if (event.target.classList.contains('checkpoint-title')) {
+            renderCheckpointMap();
+        }
+    });
+
     // устанавливаем ширину прогресса при загрузке
     document.getElementById('progressBar').style.width = '33%';
 </script>
