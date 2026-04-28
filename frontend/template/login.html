@@ -68,6 +68,7 @@
     </div>
 
     <script src="js/theme-switcher.js"></script>
+    <script src="js/auth-api.js"></script>
     <script>
         // Модальное окно восстановления пароля
         const forgotLink = document.getElementById('forgotPasswordLink');
@@ -97,19 +98,29 @@
         // Форма входа
         const loginForm = document.getElementById('loginForm');
         const errorMessage = document.getElementById('errorMessage');
-        
-        loginForm?.addEventListener('submit', (e) => {
+
+        function showError(message) {
+            errorMessage.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+            errorMessage.style.display = 'block';
+        }
+
+        loginForm?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const login = loginForm.querySelector('input[name="login"]').value;
+
+            const username = loginForm.querySelector('input[name="login"]').value.trim();
             const password = loginForm.querySelector('input[name="password"]').value;
-            
-            if (login === 'alex@imprezzio.ru' && password === 'password123') {
-                window.location.href = '../index.html';
-            } else {
-                errorMessage.style.display = 'block';
-                setTimeout(() => {
-                    errorMessage.style.display = 'none';
-                }, 3000);
+
+            try {
+                errorMessage.style.display = 'none';
+
+                await AuthApi.signIn({
+                    username,
+                    password,
+                });
+
+                window.location.href = 'index.html';
+            } catch (error) {
+                showError(error.message || 'Ошибка входа');
             }
         });
         

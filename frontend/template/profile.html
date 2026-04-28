@@ -386,168 +386,347 @@
         </div>
     </div>
 
+    <script src="js/auth-api.js"></script>
     <script src="js/theme-switcher.js"></script>
     <script>
-        // Бургер-меню
-        const burgerBtn = document.getElementById('burgerBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const menuOverlay = document.getElementById('menuOverlay');
-        const closeMenuBtn = document.getElementById('closeMenuBtn');
-        
-        function openMenu() {
-            mobileMenu.classList.add('active');
-            menuOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+    // Проверка подключения AuthApi
+    if (!window.AuthApi) {
+        alert('AuthApi не подключён. Проверь путь к auth-api.js');
+    }
+
+    // Бургер-меню
+    const burgerBtn = document.getElementById('burgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+
+    function openMenu() {
+        mobileMenu.classList.add('active');
+        menuOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+        mobileMenu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    burgerBtn?.addEventListener('click', openMenu);
+    closeMenuBtn?.addEventListener('click', closeMenu);
+    menuOverlay?.addEventListener('click', closeMenu);
+
+    // Вкладки
+    const tabs = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabId = tab.dataset.tab;
+
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+
+            tab.classList.add('active');
+
+            const activeTab = document.getElementById(`${tabId}-tab`);
+            if (activeTab) activeTab.classList.add('active');
+        });
+    });
+
+    // Модалки
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const editModal = document.getElementById('editProfileModal');
+    const closeEditModal = document.getElementById('closeEditModal');
+
+    const createTeamBtn = document.getElementById('createTeamBtn');
+    const joinTeamBtn = document.getElementById('joinTeamBtn');
+    const createModal = document.getElementById('createTeamModal');
+    const joinModal = document.getElementById('joinTeamModal');
+    const closeCreateModal = document.getElementById('closeCreateModal');
+    const closeJoinModal = document.getElementById('closeJoinModal');
+
+    function openEditModal() {
+        editModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditModalFunc() {
+        editModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function openCreateModal() {
+        createModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCreateModalFunc() {
+        createModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function openJoinModal() {
+        joinModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeJoinModalFunc() {
+        joinModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    editProfileBtn?.addEventListener('click', openEditModal);
+    closeEditModal?.addEventListener('click', closeEditModalFunc);
+
+    createTeamBtn?.addEventListener('click', openCreateModal);
+    closeCreateModal?.addEventListener('click', closeCreateModalFunc);
+
+    joinTeamBtn?.addEventListener('click', openJoinModal);
+    closeJoinModal?.addEventListener('click', closeJoinModalFunc);
+
+    editModal?.addEventListener('click', (e) => {
+        if (e.target === editModal) closeEditModalFunc();
+    });
+
+    createModal?.addEventListener('click', (e) => {
+        if (e.target === createModal) closeCreateModalFunc();
+    });
+
+    joinModal?.addEventListener('click', (e) => {
+        if (e.target === joinModal) closeJoinModalFunc();
+    });
+
+    // Дата рождения
+    const birthdateInput = document.getElementById('birthdateInput');
+    const birthdateText = document.getElementById('birthdateText');
+
+    function calculateAge(birthDate) {
+        const today = new Date();
+        const birth = new Date(birthDate);
+
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
         }
-        
-        function closeMenu() {
-            mobileMenu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-            document.body.style.overflow = '';
+
+        return age;
+    }
+
+    function formatDateToRussian(dateString) {
+        const date = new Date(dateString);
+
+        if (Number.isNaN(date.getTime())) {
+            return '';
         }
-        
-        burgerBtn?.addEventListener('click', openMenu);
-        closeMenuBtn?.addEventListener('click', closeMenu);
-        menuOverlay?.addEventListener('click', closeMenu);
-        
-        // Выход из аккаунта
-        const logoutBtn = document.getElementById('logoutBtn');
-        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
-        
-        function handleLogout() {
-            if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
-                window.location.href = 'auth/login.html';
+
+        const months = [
+            'января', 'февраля', 'марта', 'апреля',
+            'мая', 'июня', 'июля', 'августа',
+            'сентября', 'октября', 'ноября', 'декабря'
+        ];
+
+        const day = date.getDate();
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+        const age = calculateAge(dateString);
+
+        return `${day} ${month} ${year} (${age} лет)`;
+    }
+
+    // Загрузка профиля
+    async function loadProfile() {
+        try {
+            const me = await AuthApi.authorizedFetch('/accounts/Me');
+
+            const profileName = document.querySelector('.profile-info h2');
+            const profileEmail = document.querySelector('.profile-info .email');
+            const usernameInput = document.querySelector('#editProfileForm input[name="username"]');
+            const emailInput = document.querySelector('#editProfileForm input[name="email"]');
+
+            if (profileName) {
+                profileName.textContent = me.username || 'Пользователь';
             }
+
+            if (profileEmail) {
+                profileEmail.textContent = me.role || '';
+            }
+
+            if (usernameInput) {
+                usernameInput.value = me.username || '';
+            }
+
+            if (emailInput) {
+                emailInput.value = me.role || '';
+            }
+
+            localStorage.setItem('app_user', JSON.stringify(me));
+        } catch (error) {
+            console.error('Ошибка загрузки профиля:', error);
+            window.location.href = 'login.html';
         }
-        
-        logoutBtn?.addEventListener('click', handleLogout);
-        mobileLogoutBtn?.addEventListener('click', handleLogout);
-        
-        // Переключение вкладок
-        const tabs = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
-        
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabId = tab.dataset.tab;
-                tabs.forEach(t => t.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-                tab.classList.add('active');
-                const activeTab = document.getElementById(`${tabId}-tab`);
-                if (activeTab) activeTab.classList.add('active');
+    }
+
+    // Обновление профиля
+    document.getElementById('editProfileForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = e.target.querySelector('input[name="username"]').value.trim();
+        const newBirthdate = birthdateInput?.value;
+
+        try {
+            await AuthApi.authorizedFetch('/accounts/Update', {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    username: username,
+                })
             });
-        });
-        
-        // Модальное окно редактирования профиля
-        const editProfileBtn = document.getElementById('editProfileBtn');
-        const editModal = document.getElementById('editProfileModal');
-        const closeEditModal = document.getElementById('closeEditModal');
-        const birthdateInput = document.getElementById('birthdateInput');
-        const birthdateText = document.getElementById('birthdateText');
-        
-        function formatDateToRussian(dateString) {
-            const date = new Date(dateString);
-            const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-            const day = date.getDate();
-            const month = months[date.getMonth()];
-            const year = date.getFullYear();
-            const age = calculateAge(dateString);
-            return `${day} ${month} ${year} (${age} лет)`;
-        }
-        
-        function calculateAge(birthDate) {
-            const today = new Date();
-            const birth = new Date(birthDate);
-            let age = today.getFullYear() - birth.getFullYear();
-            const monthDiff = today.getMonth() - birth.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-                age--;
+
+            const profileName = document.querySelector('.profile-info h2');
+
+            if (profileName) {
+                profileName.textContent = username;
             }
-            return age;
-        }
-        
-        function openEditModal() {
-            editModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closeEditModalFunc() {
-            editModal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        editProfileBtn?.addEventListener('click', openEditModal);
-        closeEditModal?.addEventListener('click', closeEditModalFunc);
-        editModal?.addEventListener('click', (e) => {
-            if (e.target === editModal) closeEditModalFunc();
-        });
-        
-        // Сохранение данных профиля
-        document.getElementById('editProfileForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const newBirthdate = birthdateInput.value;
-            if (newBirthdate) {
+
+            if (newBirthdate && birthdateText) {
                 birthdateText.textContent = formatDateToRussian(newBirthdate);
             }
-            alert('Данные профиля успешно обновлены!');
+
+            alert('Профиль обновлён');
             closeEditModalFunc();
-        });
-        
-        // Модальные окна команд
-        const createTeamBtn = document.getElementById('createTeamBtn');
-        const joinTeamBtn = document.getElementById('joinTeamBtn');
-        const createModal = document.getElementById('createTeamModal');
-        const joinModal = document.getElementById('joinTeamModal');
-        const closeCreateModal = document.getElementById('closeCreateModal');
-        const closeJoinModal = document.getElementById('closeJoinModal');
-        
-        function openCreateModal() {
-            createModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+        } catch (error) {
+            console.error('Ошибка обновления профиля:', error);
+            alert(error.message || 'Ошибка обновления профиля');
         }
-        
-        function openJoinModal() {
-            joinModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+    });
+
+    // Загрузка команд
+    async function loadTeams() {
+        try {
+            const teams = await AuthApi.authorizedFetch('/teams');
+
+            const teamsTab = document.getElementById('teams-tab');
+            const actions = teamsTab?.querySelector('.team-actions');
+
+            if (!teamsTab || !actions) return;
+
+            teamsTab.querySelectorAll('.quest-item').forEach(item => item.remove());
+
+            const list = Array.isArray(teams) ? teams : [];
+
+            if (!list.length) {
+                actions.insertAdjacentHTML('beforebegin', `
+                    <div class="quest-item">
+                        <div class="quest-item-info">
+                            <div class="quest-item-title">У вас пока нет команд</div>
+                            <div class="quest-item-meta">Создайте команду или вступите по коду</div>
+                        </div>
+                    </div>
+                `);
+                return;
+            }
+
+            list.forEach(team => {
+                const name = team.name || team.title || team;
+                const description = team.description || '';
+                const code = team.code ? `Код: <span class="invite-code">${team.code}</span>` : '';
+
+                actions.insertAdjacentHTML('beforebegin', `
+                    <div class="quest-item">
+                        <div class="quest-item-info">
+                            <div class="quest-item-title">
+                                <i class="fas fa-users"></i> ${name}
+                            </div>
+                            <div class="quest-item-meta">
+                                ${description} ${code}
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки команд:', error);
         }
-        
-        function closeCreateModalFunc() {
-            createModal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        function closeJoinModalFunc() {
-            joinModal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        createTeamBtn?.addEventListener('click', openCreateModal);
-        joinTeamBtn?.addEventListener('click', openJoinModal);
-        closeCreateModal?.addEventListener('click', closeCreateModalFunc);
-        closeJoinModal?.addEventListener('click', closeJoinModalFunc);
-        
-        createModal?.addEventListener('click', (e) => {
-            if (e.target === createModal) closeCreateModalFunc();
-        });
-        joinModal?.addEventListener('click', (e) => {
-            if (e.target === joinModal) closeJoinModalFunc();
-        });
-        
-        // Обработка форм
-        document.getElementById('createTeamForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const teamName = e.target.querySelector('input[name="teamName"]').value;
-            alert(`Команда "${teamName}" создана! Код команды: ${Math.random().toString(36).substring(2, 10).toUpperCase()}`);
+    }
+
+    // Создание команды
+    document.getElementById('createTeamForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = e.target.querySelector('input[name="teamName"]').value.trim();
+        const description = e.target.querySelector('textarea[name="description"]').value.trim();
+
+        try {
+            await AuthApi.authorizedFetch('/teams', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: name,
+                    description: description
+                })
+            });
+
+            alert(`Команда "${name}" создана`);
             closeCreateModalFunc();
             e.target.reset();
-        });
-        
-        document.getElementById('joinTeamForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Вы успешно вступили в команду!');
+
+            await loadTeams();
+        } catch (error) {
+            console.error('Ошибка создания команды:', error);
+            alert(error.message || 'Ошибка создания команды');
+        }
+    });
+
+    // Вступление в команду
+    document.getElementById('joinTeamForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const code = e.target.querySelector('input[name="inviteCode"]').value.trim();
+
+        try {
+            await AuthApi.authorizedFetch('/teams/join', {
+                method: 'POST',
+                body: JSON.stringify({
+                    code: code
+                })
+            });
+
+            alert('Вы успешно вступили в команду');
             closeJoinModalFunc();
             e.target.reset();
-        });
+
+            await loadTeams();
+        } catch (error) {
+            console.error('Ошибка вступления в команду:', error);
+            alert(error.message || 'Ошибка вступления в команду');
+        }
+    });
+
+    // Выход из аккаунта
+    const logoutBtn = document.getElementById('logoutBtn');
+    const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+
+    async function handleLogout() {
+        if (!confirm('Вы уверены, что хотите выйти из аккаунта?')) return;
+
+        try {
+            await AuthApi.signOut();
+        } catch (error) {
+            console.error('Ошибка выхода:', error);
+        } finally {
+            window.location.href = 'login.html';
+        }
+    }
+
+    logoutBtn?.addEventListener('click', handleLogout);
+    mobileLogoutBtn?.addEventListener('click', handleLogout);
+
+    // Старт
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadProfile();
+        await loadTeams();
+    });
     </script>
 </body>
 </html>
