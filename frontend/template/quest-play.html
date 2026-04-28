@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Imprezzio: Path - Детали квеста</title>
+    <title>Imprezzio: Path - Прохождение квеста</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
@@ -12,9 +12,9 @@
 <body>
     <header class="header">
         <div class="container header-inner">
-            <a href="index.html" class="logo">Imprezzio:<span>Path</span></a>
+            <a href="../index.html" class="logo">Imprezzio:<span>Path</span></a>
             <div class="nav-links">
-                <a href="index.html">Квесты</a>
+                <a href="../index.html">Квесты</a>
                 <a href="rating.html">Рейтинг</a>
                 <a href="profile.html">Профиль</a>
                 <a href="create-quest.html">Создать</a>
@@ -49,7 +49,7 @@
     <div class="menu-overlay" id="menuOverlay"></div>
     <div class="mobile-menu" id="mobileMenu">
         <button class="close-menu" id="closeMenuBtn"><i class="fas fa-times"></i></button>
-        <a href="index.html">Квесты</a>
+        <a href="../index.html">Квесты</a>
         <a href="rating.html">Рейтинг</a>
         <a href="profile.html">Профиль</a>
         <a href="create-quest.html">Создать</a>
@@ -74,80 +74,56 @@
         </button>
     </div>
 
-    <main class="container">
-        <div id="questDetail"></div>
-    </main>
+    <main class="play-container" id="playContent"></main>
 
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div class="footer-logo">
-                <a href="index.html" class="logo">Imprezzio:<span>Path</span></a>
-                <p>Городские квесты для активных подростков</p>
-            </div>
-            <div class="footer-links">
-                <div class="footer-column">
-                    <h4>О проекте</h4>
-                    <a href="#">О нас</a>
-                    <a href="#">Правила</a>
-                    <a href="#">Контакты</a>
-                </div>
-                <div class="footer-column">
-                    <h4>Помощь</h4>
-                    <a href="#">FAQ</a>
-                    <a href="#">Поддержка</a>
-                    <a href="#">Безопасность</a>
-                </div>
-                <div class="footer-column">
-                    <h4>Соцсети</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-telegram"></i></a>
-                        <a href="#"><i class="fab fa-vk"></i></a>
-                        <a href="#"><i class="fab fa-discord"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Imprezzio: Path. Все права защищены.</p>
+    <!-- Модальное окно для сообщений -->
+    <div id="messageModal" class="custom-modal">
+        <div class="modal-window">
+            <i id="modalIcon" class="fas fa-info-circle"></i>
+            <h3 id="modalTitle">Внимание</h3>
+            <p id="modalMessage">Сообщение</p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="modalOkBtn">Хорошо</button>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <!-- Модальное окно жалобы -->
-    <div id="reportModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-flag"></i> Пожаловаться на квест</h3>
-                <button class="modal-close" id="closeModalBtn">&times;</button>
+    <!-- Модальное окно жалобы на чекпоинт -->
+    <div id="complaintModal" class="custom-modal">
+        <div class="modal-window complaint-modal">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3><i class="fas fa-flag" style="color: var(--red);"></i> Пожаловаться на чекпоинт</h3>
+                <button id="closeComplaintModal" style="background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer;">&times;</button>
             </div>
-            <form id="reportForm">
+            <form id="complaintForm">
                 <div class="form-group">
                     <label>Причина жалобы</label>
-                    <div class="custom-select-wrapper">
-                        <select name="reason" class="custom-select" required>
-                            <option value="">Выберите причину</option>
-                            <option value="wrong">Неверная информация</option>
-                            <option value="offensive">Оскорбительное содержание</option>
-                            <option value="dangerous">Опасный маршрут</option>
-                            <option value="broken">Неработающие чекпоинты</option>
-                            <option value="other">Другое</option>
-                        </select>
-                        <i class="fas fa-chevron-down select-arrow"></i>
-                    </div>
+                    <select name="reason" id="complaintReason" required>
+                        <option value="">Выберите причину</option>
+                        <option value="wrong">Неверная информация в задании</option>
+                        <option value="broken">Неработающий чекпоинт</option>
+                        <option value="offensive">Оскорбительное содержание</option>
+                        <option value="dangerous">Опасное местоположение</option>
+                        <option value="other">Другое</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Подробное описание</label>
-                    <div class="custom-select-wrapper">
-                        <textarea class="custom-select" name="description" rows="4" required minlength="20" placeholder="Опишите проблему подробно..."></textarea>
-                    </div>
-                
+                    <textarea id="complaintDescription" rows="4" required minlength="20" placeholder="Опишите проблему подробно..."></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Отправить жалобу</button>
+                <input type="hidden" id="complaintCheckpointId" value="">
+                <input type="hidden" id="complaintCheckpointTitle" value="">
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-outline" id="cancelComplaintBtn">Отмена</button>
+                    <button type="submit" class="btn btn-danger">Отправить жалобу</button>
+                </div>
             </form>
         </div>
     </div>
 
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ_api&lang=ru_RU"></script>
     <script src="js/theme-switcher.js"></script>
-    <script src="js/quest-detail.js"></script>
     <script src="js/menu.js"></script>
+    <script src="js/quest-play.js"></script>
 </body>
 </html>
