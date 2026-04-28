@@ -907,7 +907,7 @@
                 }
                 if (currentStep === 2 && checkpoints.length < 3) {
                     alert('Добавьте минимум 3 чекпоинта');
-                    renderCheckpointsList();
+                    refreshCheckpointsUi();
                     return;
                 }
                 currentStep++;
@@ -1114,6 +1114,12 @@
             });
         }
 
+        function refreshCheckpointsUi() {
+            renderCheckpointsList();
+            renderCheckpointsMap();
+            updatePreview();
+        }
+
         function centerCheckpointsMap() {
             if (!checkpointsMap) return;
             if (checkpoints.length > 1) {
@@ -1127,6 +1133,7 @@
         window.focusCheckpoint = function(index) {
             activeCheckpointIndex = index;
             renderCheckpointsList();
+            renderCheckpointsMap();
             if (checkpointsMap && checkpoints[index]?.coords) {
                 checkpointsMap.setCenter(checkpoints[index].coords, Math.max(checkpointsMap.getZoom(), 15), { duration: 250 });
             }
@@ -1154,14 +1161,18 @@
                 if (checkpoints.length >= 3) errorDiv.style.display = 'none';
                 else errorDiv.style.display = 'block';
             }
-            renderCheckpointsMap();
-            updatePreview();
         }
-        
+
         window.deleteCheckpoint = function(index) {
-            if (confirm('Удалить этот чекпоинт?')) { checkpoints.splice(index, 1); renderCheckpointsList(); }
+            if (confirm('Удалить этот чекпоинт?')) {
+                checkpoints.splice(index, 1);
+                if (activeCheckpointIndex !== null) {
+                    activeCheckpointIndex = checkpoints.length ? Math.min(activeCheckpointIndex, checkpoints.length - 1) : null;
+                }
+                refreshCheckpointsUi();
+            }
         };
-        
+
         window.editCheckpoint = function(index) {
             editingIndex = index;
             const cp = checkpoints[index];
@@ -1169,44 +1180,35 @@
         };
         
         // Функции для управления required атрибутами
+        function setFieldsState(containerId, enabled) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.querySelectorAll('input, textarea, select').forEach((field) => {
+                field.disabled = !enabled;
+                if (field.dataset.wasRequired === 'true') {
+                    field.required = enabled;
+                }
+            });
+        }
+
+        document.querySelectorAll('#checkpointForm [required]').forEach((field) => {
+            field.dataset.wasRequired = 'true';
+        });
+
         function disableChoiceRequired() {
-            const choiceInputs = ['option1', 'option2', 'option3', 'option4'];
-            choiceInputs.forEach(name => {
-                const input = document.querySelector(`#checkpointForm [name="${name}"]`);
-                if (input) input.removeAttribute('required');
-            });
-            const correctRadio = document.querySelector('#checkpointForm [name="correctOption"]');
-            if (correctRadio) correctRadio.removeAttribute('required');
+            setFieldsState('choiceFields', false);
         }
-        
+
         function enableChoiceRequired() {
-            const choiceInputs = ['option1', 'option2', 'option3', 'option4'];
-            choiceInputs.forEach(name => {
-                const input = document.querySelector(`#checkpointForm [name="${name}"]`);
-                if (input) input.setAttribute('required', 'required');
-            });
-            const correctRadio = document.querySelector('#checkpointForm [name="correctOption"]');
-            if (correctRadio) correctRadio.setAttribute('required', 'required');
+            setFieldsState('choiceFields', true);
         }
-        
+
         function disableCodeRequired() {
-            const codeInput = document.querySelector('#checkpointForm [name="correctCode"]');
-            if (codeInput) codeInput.removeAttribute('required');
-            const hintInputs = ['hint1', 'hint2', 'hint3'];
-            hintInputs.forEach(name => {
-                const input = document.querySelector(`#checkpointForm [name="${name}"]`);
-                if (input) input.removeAttribute('required');
-            });
+            setFieldsState('codeFields', false);
         }
-        
+
         function enableCodeRequired() {
-            const codeInput = document.querySelector('#checkpointForm [name="correctCode"]');
-            if (codeInput) codeInput.setAttribute('required', 'required');
-            const hintInputs = ['hint1', 'hint2', 'hint3'];
-            hintInputs.forEach(name => {
-                const input = document.querySelector(`#checkpointForm [name="${name}"]`);
-                if (input) input.setAttribute('required', 'required');
-            });
+            setFieldsState('codeFields', true);
         }
         
         // Карта
@@ -1271,9 +1273,9 @@
                     const correctCodeInput = form.querySelector('[name="correctCode"]');
                     if (correctCodeInput) correctCodeInput.value = cpData.correctCode;
                     if (cpData.hints) {
-                        const hint1 = form.querySelector('[name="hint1"]');
-                        const hint2 = form.querySelector('[name="hint2"]');
-                        const hint3 = form.querySelector('[name="hint3"]');
+                        const hint1 = codeFields?.querySelector('[name="hint1"]');
+                        const hint2 = codeFields?.querySelector('[name="hint2"]');
+                        const hint3 = codeFields?.querySelector('[name="hint3"]');
                         if (hint1) hint1.value = cpData.hints[0] || '';
                         if (hint2) hint2.value = cpData.hints[1] || '';
                         if (hint3) hint3.value = cpData.hints[2] || '';
@@ -1290,6 +1292,14 @@
                     }
                     const correctRadio = form.querySelector(`[name="correctOption"][value="${cpData.correctOption + 1}"]`);
                     if (correctRadio) correctRadio.checked = true;
+                    if (cpData.hints) {
+                        const hint1 = choiceFields?.querySelector('[name="hint1"]');
+                        const hint2 = choiceFields?.querySelector('[name="hint2"]');
+                        const hint3 = choiceFields?.querySelector('[name="hint3"]');
+                        if (hint1) hint1.value = cpData.hints[0] || '';
+                        if (hint2) hint2.value = cpData.hints[1] || '';
+                        if (hint3) hint3.value = cpData.hints[2] || '';
+                    }
                 }
                 const pointRulesInput = form.querySelector('[name="pointRules"]');
                 if (pointRulesInput) pointRulesInput.value = cpData.pointRules || '';
@@ -1402,6 +1412,11 @@
                     }
                     checkpoint.options = options;
                     checkpoint.correctOption = parseInt(correctOption) - 1;
+                    checkpoint.hints = [
+                        formData.get('hint1') || '',
+                        formData.get('hint2') || '',
+                        formData.get('hint3') || ''
+                    ];
                 }
                 
                 if (editingIndex !== null) {
@@ -1412,7 +1427,7 @@
                     activeCheckpointIndex = checkpoints.length - 1;
                 }
                 
-                renderCheckpointsList();
+                refreshCheckpointsUi();
                 closeCheckpointModal();
                 
                 // Очищаем форму
@@ -1438,7 +1453,7 @@
         
         // Инициализация
         renderCategories();
-        renderCheckpointsList();
+        refreshCheckpointsUi();
         updateStepUI();
         updatePreview();
     </script>

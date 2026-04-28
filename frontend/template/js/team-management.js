@@ -5,7 +5,7 @@
 
     function openMenu() {
         mobileMenu?.classList.add('active');
-        menuOverlay?.classList.add('active');
+        menuOverlay?.classList.add('active');s
         document.body.style.overflow = 'hidden';
     }
 
