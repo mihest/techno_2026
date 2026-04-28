@@ -1,6 +1,11 @@
-/* Imprezzio: Path - Основные стили */
-/* Цветовая схема задаётся через темы */
+/* ============================================ */
+/* Imprezzio: Path - Основные стили             */
+/* Цветовая схема задаётся через темы           */
+/* ============================================ */
 
+/* -------------------------------------------- */
+/* Глобальные сбросы и базовые настройки        */
+/* -------------------------------------------- */
 * {
     margin: 0;
     padding: 0;
@@ -25,7 +30,9 @@ body {
     padding: 0 32px;
 }
 
-/* ===== ХЕДЕР ===== */
+/* -------------------------------------------- */
+/* Хедер (шапка сайта)                          */
+/* -------------------------------------------- */
 .header {
     background: rgba(13, 7, 22, 0.95);
     backdrop-filter: blur(10px);
@@ -183,7 +190,9 @@ body {
     cursor: pointer;
 }
 
-/* ===== ФУТЕР ===== */
+/* -------------------------------------------- */
+/* Футер (подвал сайта)                         */
+/* -------------------------------------------- */
 .footer {
     background: var(--bg-sidebar);
     border-top: 1px solid var(--border);
@@ -258,7 +267,9 @@ body {
     font-size: 0.75rem;
 }
 
-/* ===== МОБИЛЬНОЕ МЕНЮ ===== */
+/* -------------------------------------------- */
+/* Мобильное меню (бургер)                      */
+/* -------------------------------------------- */
 .mobile-menu {
     position: fixed;
     top: 0;
@@ -348,7 +359,9 @@ body {
     display: block;
 }
 
-/* ===== БОКОВАЯ ПАНЕЛЬ ФИЛЬТРОВ ===== */
+/* -------------------------------------------- */
+/* Боковая панель фильтров                      */
+/* -------------------------------------------- */
 .main-layout {
     display: flex;
     gap: 32px;
@@ -385,6 +398,9 @@ body {
     gap: 8px;
 }
 
+/* -------------------------------------------- */
+/* Категории (чипсы)                            */
+/* -------------------------------------------- */
 .categories-list {
     display: flex;
     flex-wrap: wrap;
@@ -415,7 +431,9 @@ body {
     color: var(--bg-dark);
 }
 
-/* SELECT СТИЛИЗАЦИЯ */
+/* -------------------------------------------- */
+/* Стилизация SELECT                            */
+/* -------------------------------------------- */
 .custom-select {
     width: 100%;
     padding: 12px 16px;
@@ -447,7 +465,9 @@ body {
     padding: 12px;
 }
 
-/* ЧЕКБОКС */
+/* -------------------------------------------- */
+/* Чекбоксы                                     */
+/* -------------------------------------------- */
 .custom-checkbox {
     display: flex;
     align-items: center;
@@ -538,7 +558,9 @@ body {
     box-shadow: 0 5px 20px var(--glow-pink);
 }
 
-/* ===== СЕТКА КАРТОЧЕК ===== */
+/* -------------------------------------------- */
+/* Сетка карточек квестов                       */
+/* -------------------------------------------- */
 .quests-grid {
     flex: 1;
     display: grid;
@@ -665,6 +687,9 @@ body {
     padding-top: 16px;
 }
 
+/* -------------------------------------------- */
+/* Кнопки (общие стили)                         */
+/* -------------------------------------------- */
 .btn {
     padding: 10px 14px;
     border-radius: 40px;
@@ -718,7 +743,9 @@ body {
     color: white;
 }
 
-/* ===== ПАГИНАЦИЯ ===== */
+/* -------------------------------------------- */
+/* Пагинация                                    */
+/* -------------------------------------------- */
 .pagination {
     display: flex;
     justify-content: center;
@@ -755,7 +782,9 @@ body {
     grid-column: span 3;
 }
 
-/* ===== МОДАЛЬНЫЕ ОКНА ===== */
+/* -------------------------------------------- */
+/* Модальные окна (общие)                       */
+/* -------------------------------------------- */
 .modal {
     display: none;
     position: fixed;
@@ -778,7 +807,7 @@ body {
     background: var(--bg-card);
     border-radius: 28px;
     padding: 32px;
-    max-width: 500px;
+    max-width: 700px;
     width: 90%;
     max-height: 85vh;
     overflow-y: auto;
@@ -787,14 +816,8 @@ body {
 }
 
 @keyframes modalFadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95) translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+    from { opacity: 0; transform: scale(0.95) translateY(-20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .modal-header {
@@ -827,7 +850,9 @@ body {
     transform: scale(1.1);
 }
 
-/* Формы */
+/* -------------------------------------------- */
+/* Формы (общие стили)                          */
+/* -------------------------------------------- */
 .form-group {
     margin-bottom: 20px;
 }
@@ -888,7 +913,9 @@ body {
     color: var(--text-secondary);
 }
 
-/* ===== ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ===== */
+/* -------------------------------------------- */
+/* Профиль пользователя                         */
+/* -------------------------------------------- */
 .profile-header {
     display: flex;
     gap: 40px;
@@ -954,7 +981,7 @@ body {
     gap: 8px;
 }
 
-/* Статистика */
+/* Статистика в профиле */
 .stats-grid {
     display: flex;
     gap: 20px;
@@ -990,6 +1017,74 @@ body {
 .stat-card div:last-child {
     font-size: 0.75rem;
     color: var(--text-secondary);
+}
+
+/* Расширенная статистика (на всю ширину) */
+.stats-grid-full {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 24px 0 32px;
+}
+
+.stats-grid-full .stat-card {
+    background: var(--bg-card);
+    padding: 24px 20px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.stats-grid-full .stat-card:hover {
+    border-color: var(--yellow);
+    transform: translateY(-3px);
+}
+
+.stats-grid-full .stat-card i {
+    font-size: 2rem;
+    color: var(--yellow);
+    margin-bottom: 12px;
+}
+
+.stats-grid-full .stat-card .number {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.stats-grid-full .stat-card div:last-child {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Кнопка редактирования даты рождения */
+.edit-birthdate-btn {
+    background: rgba(255, 255, 27, 0.15);
+    border: 1px solid var(--yellow);
+    color: var(--yellow);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+}
+
+.edit-birthdate-btn:hover {
+    background: var(--yellow);
+    color: var(--bg-dark);
+    transform: scale(1.05);
+}
+
+.birthdate {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
 }
 
 /* Табы профиля */
@@ -1208,7 +1303,9 @@ body {
     transition: width 0.3s;
 }
 
-/* ===== ДЕТАЛЬНАЯ СТРАНИЦА КВЕСТА ===== */
+/* -------------------------------------------- */
+/* Детальная страница квеста                    */
+/* -------------------------------------------- */
 .quest-detail-wrapper {
     margin: 32px 0;
 }
@@ -1405,330 +1502,9 @@ body {
     font-size: 0.9rem;
 }
 
-/* Адаптивность */
-@media (max-width: 1024px) {
-    .container {
-        padding: 0 24px;
-    }
-    
-    .quest-content-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .quest-sidebar {
-        position: static;
-    }
-    
-    .action-card {
-        max-width: 400px;
-        margin: 0 auto;
-    }
-    
-    .quests-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .filters-sidebar {
-        width: 100%;
-        position: static;
-    }
-    
-    .main-layout {
-        flex-direction: column;
-    }
-    
-    .profile-header {
-        padding: 30px;
-    }
-    
-    .profile-name-row h2 {
-        font-size: 1.6rem;
-    }
-    
-    .avatar-circle {
-        width: 120px;
-        height: 120px;
-        font-size: 3rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: 0 20px;
-    }
-    
-    .nav-links {
-        display: none;
-    }
-    
-    .burger-btn {
-        display: block;
-    }
-    
-    .header-controls {
-        display: none;
-    }
-    
-    .quests-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .profile-header {
-        flex-direction: column;
-        text-align: center;
-        padding: 24px;
-    }
-    
-    .profile-name-row {
-        justify-content: center;
-    }
-    
-    .profile-name-row h2 {
-        text-align: center;
-    }
-    
-    .birthdate {
-        justify-content: center;
-    }
-    
-    .stats-grid {
-        justify-content: center;
-    }
-    
-    .quest-item {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .quest-item-actions {
-        justify-content: center;
-    }
-    
-    .profile-tabs {
-        justify-content: center;
-    }
-    
-    .tab-btn {
-        padding: 8px 20px;
-        font-size: 0.85rem;
-    }
-    
-    .team-actions {
-        justify-content: center;
-    }
-    
-    .achievement-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .footer-links {
-        flex-direction: column;
-        gap: 24px;
-    }
-    
-    .quest-hero-cover {
-        height: 300px;
-    }
-    
-    .quest-hero-content {
-        padding: 24px;
-    }
-    
-    .quest-detail-title {
-        font-size: 1.8rem;
-    }
-    
-    .detail-block {
-        padding: 18px;
-    }
-    
-    .modal-content {
-        padding: 24px;
-        width: 95%;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 0 16px;
-    }
-    
-    .stat-card {
-        padding: 12px 18px;
-        min-width: 90px;
-    }
-    
-    .stat-card .number {
-        font-size: 1.4rem;
-    }
-    
-    .stat-card i {
-        font-size: 1.4rem;
-    }
-    
-    .avatar-circle {
-        width: 100px;
-        height: 100px;
-        font-size: 2.5rem;
-    }
-    
-    .profile-name-row h2 {
-        font-size: 1.4rem;
-    }
-    
-    .quest-hero-cover {
-        height: 250px;
-    }
-    
-    .quest-detail-title {
-        font-size: 1.5rem;
-    }
-    
-    .modal-content {
-        padding: 20px;
-    }
-    
-    .form-input, .form-textarea {
-        padding: 12px 14px;
-        font-size: 0.85rem;
-    }
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.quest-card {
-    animation: fadeInUp 0.4s ease-out;
-}
-
-/* ===== РАСШИРЕННЫЕ СТИЛИ ДЛЯ ПРОФИЛЯ ===== */
-
-/* Статистика на полную ширину */
-.stats-grid-full {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin: 24px 0 32px;
-}
-
-.stats-grid-full .stat-card {
-    background: var(--bg-card);
-    padding: 24px 20px;
-    border-radius: 20px;
-    text-align: center;
-    border: 1px solid var(--border);
-    transition: all 0.2s;
-    width: 100%;
-}
-
-.stats-grid-full .stat-card:hover {
-    border-color: var(--yellow);
-    transform: translateY(-3px);
-}
-
-.stats-grid-full .stat-card i {
-    font-size: 2rem;
-    color: var(--yellow);
-    margin-bottom: 12px;
-}
-
-.stats-grid-full .stat-card .number {
-    font-size: 2rem;
-    font-weight: 800;
-}
-
-.stats-grid-full .stat-card div:last-child {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-/* Кнопка редактирования даты рождения */
-.edit-birthdate-btn {
-    background: rgba(255, 255, 27, 0.15);
-    border: 1px solid var(--yellow);
-    color: var(--yellow);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 10px;
-}
-
-.edit-birthdate-btn:hover {
-    background: var(--yellow);
-    color: var(--bg-dark);
-    transform: scale(1.05);
-}
-
-.birthdate {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
-/* Адаптивность для статистики */
-@media (max-width: 1024px) {
-    .stats-grid-full {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-    }
-}
-
-@media (max-width: 768px) {
-    .stats-grid-full {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-    
-    .stats-grid-full .stat-card {
-        padding: 16px 12px;
-    }
-    
-    .stats-grid-full .stat-card .number {
-        font-size: 1.5rem;
-    }
-    
-    .stats-grid-full .stat-card i {
-        font-size: 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .stats-grid-full {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-    
-    .stats-grid-full .stat-card {
-        padding: 12px 8px;
-    }
-    
-    .stats-grid-full .stat-card .number {
-        font-size: 1.2rem;
-    }
-    
-    .edit-birthdate-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 0.7rem;
-    }
-}
-
-/* ===== СТРАНИЦА РЕЙТИНГА ===== */
-
+/* -------------------------------------------- */
+/* Страница рейтинга                            */
+/* -------------------------------------------- */
 .ranking-header {
     margin: 32px 0 24px;
 }
@@ -1889,729 +1665,9 @@ body {
     font-weight: 700;
 }
 
-/* Адаптивность рейтинга */
-@media (max-width: 768px) {
-    .ranking-header h1 {
-        font-size: 1.6rem;
-    }
-    
-    .tab-btn-ranking {
-        padding: 10px 20px;
-        font-size: 0.8rem;
-    }
-    
-    .ranking-table th,
-    .ranking-table td {
-        padding: 12px 16px;
-        font-size: 0.8rem;
-    }
-    
-    .ranking-table td:first-child {
-        width: 60px;
-    }
-}
-
-@media (max-width: 480px) {
-    .ranking-header h1 {
-        font-size: 1.4rem;
-    }
-    
-    .tab-switch {
-        gap: 10px;
-    }
-    
-    .tab-btn-ranking {
-        padding: 8px 16px;
-        font-size: 0.75rem;
-    }
-    
-    .ranking-table th,
-    .ranking-table td {
-        padding: 10px 12px;
-        font-size: 0.75rem;
-    }
-}
-
-/* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ СОЗДАНИЯ ===== */
-
-/* Секции форм */
-.form-section {
-    background: var(--bg-card);
-    border-radius: 28px;
-    padding: 32px;
-    margin-bottom: 0;
-    border: 1px solid var(--border);
-}
-
-.form-section h2 {
-    margin-bottom: 28px;
-    color: var(--yellow);
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Модальное окно с картой */
-#map {
-    height: 300px;
-    border-radius: 16px;
-    margin: 16px 0;
-    overflow: hidden;
-}
-
-.coords-info {
-    background: var(--bg-dark);
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 16px;
-}
-
-/* Ответы вариантов */
-.answer-option {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.answer-option .form-input {
-    flex: 1;
-}
-
-.radio-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.radio-label input {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    accent-color: var(--yellow);
-}
-
-/* Предпросмотр публикации */
-.publish-preview {
-    margin-bottom: 32px;
-}
-
-.preview-card {
-    background: var(--bg-dark);
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-}
-
-.preview-header {
-    background: var(--bg-card);
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    color: var(--yellow);
-}
-
-.preview-content {
-    padding: 24px;
-}
-
-.preview-content h3 {
-    font-size: 1.3rem;
-    margin-bottom: 12px;
-}
-
-.preview-meta {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 12px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-.preview-difficulty {
-    margin-bottom: 12px;
-}
-
-.preview-content p {
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 16px;
-}
-
-.preview-stats {
-    display: flex;
-    gap: 20px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-/* Информационный блок */
-.info-box {
-    background: rgba(0, 162, 232, 0.1);
-    border: 1px solid var(--electric-blue);
-    border-radius: 16px;
-    padding: 16px 20px;
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
-}
-
-.info-box i {
-    color: var(--electric-blue);
-    font-size: 1.3rem;
-}
-
-.info-box strong {
-    color: var(--electric-blue);
-}
-
-.info-box p {
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    margin-top: 4px;
-}
-
-/* Обложка preview */
-.cover-preview {
-    margin-top: 8px;
-}
-
-.cover-preview img {
-    max-width: 200px;
-    border-radius: 12px;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .form-section {
-        padding: 20px;
-    }
-    
-    .form-section h2 {
-        font-size: 1.2rem;
-    }
-    
-    .answer-option {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .radio-label {
-        justify-content: flex-start;
-    }
-    
-    .preview-content {
-        padding: 16px;
-    }
-    
-    .preview-content h3 {
-        font-size: 1.1rem;
-    }
-    
-    .preview-meta {
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-    
-    .info-box {
-        flex-direction: column;
-    }
-}
-
-/* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ СОЗДАНИЯ ===== */
-
-.form-section {
-    background: var(--bg-card);
-    border-radius: 28px;
-    padding: 32px;
-    margin-bottom: 0;
-    border: 1px solid var(--border);
-}
-
-.form-section h2 {
-    margin-bottom: 28px;
-    color: var(--yellow);
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Категории */
-.categories-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 8px;
-}
-
-.category-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    padding: 8px 16px;
-    background: var(--bg-dark);
-    border: 1px solid var(--border);
-    border-radius: 40px;
-    transition: all 0.2s;
-}
-
-.category-checkbox:hover {
-    border-color: var(--yellow);
-}
-
-.category-checkbox input {
-    position: absolute;
-    opacity: 0;
-}
-
-.category-checkbox .checkmark {
-    width: 18px;
-    height: 18px;
-    background: var(--bg-dark);
-    border: 2px solid var(--border);
-    border-radius: 4px;
-    display: inline-block;
-    position: relative;
-}
-
-.category-checkbox input:checked ~ .checkmark {
-    background: var(--yellow);
-    border-color: var(--yellow);
-}
-
-.category-checkbox input:checked ~ .checkmark:after {
-    content: '\f00c';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 10px;
-    color: var(--bg-dark);
-}
-
-.category-checkbox span:last-child {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-.category-checkbox input:checked ~ span:last-child {
-    color: var(--yellow);
-}
-
-/* Dropzone */
-.dropzone {
-    border: 2px dashed var(--border);
-    border-radius: 20px;
-    padding: 32px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: var(--bg-dark);
-}
-
-.dropzone:hover {
-    border-color: var(--yellow);
-    background: rgba(255, 255, 27, 0.05);
-}
-
-.dropzone.drag-over {
-    border-color: var(--yellow);
-    background: rgba(255, 255, 27, 0.1);
-}
-
-.dropzone i {
-    font-size: 3rem;
-    color: var(--yellow);
-    margin-bottom: 12px;
-}
-
-.dropzone p {
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-}
-
-.cover-preview {
-    margin-top: 16px;
-    position: relative;
-    display: inline-block;
-}
-
-.cover-preview img {
-    max-width: 200px;
-    border-radius: 16px;
-    border: 2px solid var(--yellow);
-}
-
-.remove-cover {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: var(--red);
-    border: none;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.remove-cover:hover {
-    transform: scale(1.1);
-}
-
-/* Чекпоинты */
-.checkpoints-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 24px;
-    max-height: 500px;
-    overflow-y: auto;
-    padding-right: 8px;
-}
-
-.checkpoints-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.checkpoints-list::-webkit-scrollbar-track {
-    background: var(--border);
-    border-radius: 10px;
-}
-
-.checkpoints-list::-webkit-scrollbar-thumb {
-    background: var(--yellow);
-    border-radius: 10px;
-}
-
-.checkpoint-card-preview {
-    background: var(--bg-dark);
-    border-radius: 16px;
-    padding: 16px;
-    border: 1px solid var(--border);
-    transition: all 0.2s;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.checkpoint-card-preview:hover {
-    border-color: var(--yellow);
-}
-
-.checkpoint-preview-info {
-    flex: 1;
-}
-
-.checkpoint-preview-title {
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.checkpoint-preview-meta {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-}
-
-.checkpoint-preview-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.empty-checkpoints {
-    text-align: center;
-    padding: 40px;
-    color: var(--text-secondary);
-    background: var(--bg-dark);
-    border-radius: 16px;
-}
-
-/* Предпросмотр */
-.preview-card {
-    background: var(--bg-dark);
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-}
-
-.preview-header {
-    background: var(--bg-card);
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    color: var(--yellow);
-}
-
-.preview-content {
-    padding: 24px;
-}
-
-.preview-cover-img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 16px;
-    margin-bottom: 20px;
-    background: var(--bg-card);
-}
-
-.preview-placeholder {
-    width: 100%;
-    height: 200px;
-    background: var(--bg-card);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-    color: var(--text-secondary);
-    border: 1px dashed var(--border);
-}
-
-.preview-content h3 {
-    font-size: 1.3rem;
-    margin-bottom: 12px;
-}
-
-.preview-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 12px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-.preview-difficulty {
-    margin-bottom: 12px;
-}
-
-.preview-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 16px 0;
-}
-
-.preview-category-tag {
-    background: rgba(255, 255, 27, 0.15);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    color: var(--yellow);
-}
-
-.preview-checkpoints-list {
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-}
-
-.preview-checkpoint-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.8rem;
-}
-
-.preview-checkpoint-item:last-child {
-    border-bottom: none;
-}
-
-.preview-checkpoint-num {
-    width: 28px;
-    height: 28px;
-    background: var(--bg-card);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--yellow);
-}
-
-/* Кнопки действий */
-.step-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 32px;
-    gap: 16px;
-}
-
-/* Модальное окно */
-.modal-content {
-    max-height: 85vh;
-    overflow-y: auto;
-}
-
-.modal-content::-webkit-scrollbar {
-    width: 6px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-    background: var(--border);
-    border-radius: 10px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-    background: var(--yellow);
-    border-radius: 10px;
-}
-
-.answer-option {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.answer-option .form-input {
-    flex: 1;
-}
-
-.radio-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.radio-label input {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    accent-color: var(--yellow);
-}
-
-.coords-info {
-    background: var(--bg-dark);
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-}
-
-.info-box {
-    background: rgba(0, 162, 232, 0.1);
-    border: 1px solid var(--electric-blue);
-    border-radius: 16px;
-    padding: 16px 20px;
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
-}
-
-.info-box i {
-    color: var(--electric-blue);
-    font-size: 1.3rem;
-}
-
-.info-box strong {
-    color: var(--electric-blue);
-}
-
-.info-box p {
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    margin-top: 4px;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .form-section {
-        padding: 20px;
-    }
-    
-    .form-section h2 {
-        font-size: 1.2rem;
-    }
-    
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-group.full-width {
-        grid-column: span 1;
-    }
-    
-    .categories-grid {
-        gap: 8px;
-    }
-    
-    .category-checkbox {
-        padding: 6px 12px;
-    }
-    
-    .category-checkbox span:last-child {
-        font-size: 0.75rem;
-    }
-    
-    .step-actions {
-        flex-direction: column;
-    }
-    
-    .step-actions .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .preview-meta {
-        gap: 10px;
-    }
-    
-    .preview-content {
-        padding: 16px;
-    }
-    
-    .preview-content h3 {
-        font-size: 1.1rem;
-    }
-    
-    .answer-option {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .radio-label {
-        justify-content: flex-start;
-    }
-}
-
-/* ===== СТРАНИЦЫ АВТОРИЗАЦИИ И РЕГИСТРАЦИИ ===== */
-
+/* -------------------------------------------- */
+/* Страницы авторизации и регистрации           */
+/* -------------------------------------------- */
 .auth-container {
     min-height: 100vh;
     display: flex;
@@ -2709,13 +1765,6 @@ body {
 
 .auth-card .form-input:hover {
     border-color: var(--orange);
-}
-
-.input-hint {
-    display: block;
-    margin-top: 6px;
-    font-size: 0.7rem;
-    color: var(--text-secondary);
 }
 
 /* Ошибка */
@@ -2885,7 +1934,1770 @@ body {
     padding: 12px;
 }
 
-/* Адаптивность */
+/* -------------------------------------------- */
+/* Страница управления командой                 */
+/* -------------------------------------------- */
+.team-header {
+    background: var(--bg-card);
+    border-radius: 28px;
+    padding: 32px;
+    margin: 32px 0;
+    border: 1px solid var(--border);
+}
+
+.team-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.team-details h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.team-details .team-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 12px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.team-stats {
+    display: flex;
+    gap: 24px;
+    background: var(--bg-dark);
+    padding: 16px 24px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+}
+
+.team-stat {
+    text-align: center;
+}
+
+.team-stat .number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--yellow);
+}
+
+.team-stat .label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.invite-section {
+    background: var(--bg-dark);
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 24px;
+    border: 1px solid var(--border);
+}
+
+.invite-code {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.code-display {
+    background: var(--bg-card);
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-family: monospace;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    border: 1px solid var(--border);
+}
+
+.members-section {
+    background: var(--bg-card);
+    border-radius: 28px;
+    padding: 32px;
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+}
+
+.members-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.members-header h2 {
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.member-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--bg-dark);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+}
+
+.member-item:hover {
+    border-color: var(--yellow);
+}
+
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.member-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--bg-dark);
+}
+
+.member-details h4 {
+    margin-bottom: 4px;
+}
+
+.member-details p {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.member-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(255, 255, 27, 0.15);
+    color: var(--yellow);
+}
+
+.member-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.danger-zone {
+    background: rgba(237, 28, 36, 0.05);
+    border: 1px solid var(--red);
+    border-radius: 20px;
+    padding: 24px;
+    margin-top: 24px;
+}
+
+.danger-zone h3 {
+    color: var(--red);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.danger-zone p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+}
+
+.empty-members {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+/* -------------------------------------------- */
+/* Страница создания квеста (шаги)              */
+/* -------------------------------------------- */
+.steps-container {
+    margin: 32px 0;
+}
+
+.steps-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    position: relative;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.steps-indicator::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.step-circle {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    transition: all 0.3s;
+}
+
+.step.active .step-circle {
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    border-color: transparent;
+    color: var(--bg-dark);
+    box-shadow: 0 0 15px var(--glow-yellow);
+}
+
+.step.completed .step-circle {
+    background: var(--bright-green);
+    border-color: var(--bright-green);
+    color: white;
+}
+
+.step.completed .step-circle i {
+    font-size: 1.2rem;
+}
+
+.step-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.step.active .step-label {
+    color: var(--yellow);
+}
+
+.step-content {
+    display: none;
+    animation: fadeInUp 0.3s ease;
+}
+
+.step-content.active {
+    display: block;
+}
+
+/* Секции форм */
+.form-section {
+    background: var(--bg-card);
+    border-radius: 28px;
+    padding: 32px;
+    margin-bottom: 0;
+    border: 1px solid var(--border);
+}
+
+.form-section h2 {
+    margin-bottom: 28px;
+    color: var(--yellow);
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.form-group label.required::after {
+    content: '*';
+    color: var(--red);
+    margin-left: 4px;
+}
+
+.form-input, .form-textarea, .custom-select {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--text-primary);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.form-input:focus, .form-textarea:focus, .custom-select:focus {
+    outline: none;
+    border-color: var(--yellow);
+    box-shadow: 0 0 0 2px var(--glow-yellow);
+}
+
+/* Категории как на главной странице */
+.categories-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.category-chip {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    padding: 8px 18px;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-secondary);
+}
+
+.category-chip:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+}
+
+.category-chip.active {
+    background: var(--pink);
+    border-color: var(--pink);
+    color: white;
+}
+
+/* Dropzone */
+.dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg-dark);
+}
+
+.dropzone:hover, .dropzone.drag-over {
+    border-color: var(--yellow);
+    background: rgba(255, 255, 27, 0.05);
+}
+
+.dropzone i {
+    font-size: 3rem;
+    color: var(--yellow);
+    margin-bottom: 12px;
+}
+
+.cover-preview {
+    margin-top: 16px;
+    position: relative;
+    display: inline-block;
+}
+
+.cover-preview img {
+    max-width: 200px;
+    border-radius: 16px;
+    border: 2px solid var(--yellow);
+}
+
+.remove-cover {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--red);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Чекпоинты */
+.checkpoints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-right: 8px;
+}
+
+.checkpoints-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.checkpoints-list::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.checkpoints-list::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+.checkpoint-card-preview {
+    background: var(--bg-dark);
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.checkpoint-card-preview:hover {
+    border-color: var(--yellow);
+}
+
+.empty-checkpoints {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    background: var(--bg-dark);
+    border-radius: 16px;
+}
+
+.step-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+    gap: 16px;
+}
+
+/* Предпросмотр */
+.preview-card {
+    background: var(--bg-dark);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.preview-header {
+    background: var(--bg-card);
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--yellow);
+}
+
+.preview-content {
+    padding: 24px;
+}
+
+.preview-cover-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+.preview-placeholder {
+    width: 100%;
+    height: 200px;
+    background: var(--bg-card);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+    border: 1px dashed var(--border);
+}
+
+/* Информационный блок */
+.info-box {
+    background: rgba(0, 162, 232, 0.1);
+    border: 1px solid var(--electric-blue);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.info-box i {
+    color: var(--electric-blue);
+    font-size: 1.3rem;
+}
+
+.info-box strong {
+    color: var(--electric-blue);
+}
+
+.info-box p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+/* Модальное окно с картой */
+#map {
+    height: 300px;
+    border-radius: 16px;
+    margin: 16px 0;
+    overflow: hidden;
+}
+
+.coords-info {
+    background: var(--bg-dark);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+/* Ответы вариантов */
+.answer-option {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.answer-option .form-input {
+    flex: 1;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.radio-label input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--yellow);
+}
+
+/* -------------------------------------------- */
+/* Страница прохождения квеста (quest-play)     */
+/* -------------------------------------------- */
+.play-container {
+    max-width: 1600px;
+    width: 100%;
+    margin: 32px auto;
+    padding: 0 32px;
+}
+
+.play-header {
+    background: var(--bg-card);
+    border-radius: 24px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    border: 1px solid var(--border);
+}
+
+.quest-info h2 {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+}
+
+.quest-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.progress-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.checkpoint-circles {
+    display: flex;
+    gap: 12px;
+}
+
+.circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    transition: all 0.3s;
+    font-size: 1rem;
+    position: relative;
+}
+
+.circle.completed {
+    border-color: var(--neon-green);
+    background: rgba(128, 255, 2, 0.15);
+    color: var(--neon-green);
+}
+
+.circle.active {
+    border-color: var(--yellow);
+    background: rgba(255, 255, 27, 0.15);
+    color: var(--yellow);
+    box-shadow: 0 0 12px var(--glow-yellow);
+}
+
+.circle .complaint-icon {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    font-size: 0.7rem;
+    background: var(--bg-card);
+    border-radius: 50%;
+    padding: 2px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: 0.2s;
+}
+
+.circle .complaint-icon:hover {
+    color: var(--red);
+}
+
+.points-badge {
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    padding: 8px 20px;
+    border-radius: 40px;
+    font-weight: 700;
+    color: var(--bg-dark);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Карта */
+.map-container {
+    background: var(--bg-card);
+    border-radius: 24px;
+    overflow: hidden;
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+}
+
+#map {
+    height: 450px;
+    width: 100%;
+}
+
+/* Текущее задание */
+.task-container {
+    background: var(--bg-card);
+    border-radius: 24px;
+    padding: 32px;
+    border: 1px solid var(--border);
+    margin-bottom: 28px;
+}
+
+.task-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.task-title-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.task-title-left h3 {
+    font-size: 1.4rem;
+}
+
+.task-title-left i {
+    color: var(--yellow);
+    font-size: 1.6rem;
+}
+
+.complaint-checkpoint-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+.complaint-checkpoint-btn:hover {
+    color: var(--red);
+    background: rgba(237, 28, 36, 0.1);
+}
+
+.task-description {
+    background: var(--bg-dark);
+    padding: 24px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.points-info-bar {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.points-info-bar span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Подсказки */
+.hints-section {
+    background: var(--bg-dark);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.hints-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    color: var(--cyan);
+    font-weight: 600;
+}
+
+.hint-card {
+    background: rgba(0, 162, 232, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.hint-card.available {
+    cursor: pointer;
+}
+
+.hint-card.available:hover {
+    border-color: var(--cyan);
+    background: rgba(0, 162, 232, 0.1);
+}
+
+.hint-card.revealed {
+    background: rgba(0, 162, 232, 0.15);
+    border-color: var(--cyan);
+    opacity: 0.7;
+    cursor: default;
+}
+
+.hint-text {
+    font-size: 0.9rem;
+}
+
+.hint-text i {
+    margin-right: 8px;
+    color: var(--cyan);
+}
+
+.hint-cost {
+    font-size: 0.75rem;
+    color: var(--yellow);
+    font-weight: 600;
+    background: rgba(255, 255, 27, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* Варианты ответов */
+.options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.option-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.option-btn:hover {
+    border-color: var(--yellow);
+    background: rgba(255, 255, 27, 0.05);
+}
+
+.option-btn.selected {
+    border-color: var(--yellow);
+    background: rgba(255, 255, 27, 0.1);
+}
+
+.option-marker {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.option-btn.selected .option-marker {
+    border-color: var(--yellow);
+    background: var(--yellow);
+}
+
+.option-btn.selected .option-marker:after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 11px;
+    color: var(--bg-dark);
+}
+
+.option-text {
+    flex: 1;
+    font-size: 0.95rem;
+}
+
+/* Поле ввода */
+.code-input-group {
+    margin-bottom: 24px;
+}
+
+.code-input-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.code-input {
+    width: 100%;
+    padding: 16px 20px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    color: var(--text-primary);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+}
+
+.code-input:focus {
+    outline: none;
+    border-color: var(--yellow);
+}
+
+/* Кнопки действий */
+.action-buttons {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    padding: 14px 28px;
+    font-size: 0.95rem;
+}
+
+/* Завершение квеста */
+.completion-card {
+    text-align: center;
+    padding: 60px;
+}
+
+.completion-icon {
+    font-size: 6rem;
+    color: var(--yellow);
+    margin-bottom: 24px;
+}
+
+.completion-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+}
+
+.completion-stat {
+    background: var(--bg-dark);
+    padding: 20px 32px;
+    border-radius: 20px;
+    text-align: center;
+    min-width: 140px;
+}
+
+.completion-stat .value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--yellow);
+}
+
+/* Модальные окна (кастомные) */
+.custom-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.custom-modal.active {
+    display: flex;
+}
+
+.modal-window {
+    background: var(--bg-card);
+    border-radius: 28px;
+    padding: 32px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    border: 1px solid var(--border);
+    animation: modalFadeIn 0.3s ease;
+}
+
+.modal-window i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.modal-window h3 {
+    margin-bottom: 12px;
+}
+
+.modal-window p {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* Модальное окно жалобы */
+.complaint-modal {
+    max-width: 550px;
+    text-align: left;
+}
+
+.complaint-modal .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.complaint-modal label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.complaint-modal select,
+.complaint-modal textarea {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--text-primary);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+}
+
+.complaint-modal select:focus,
+.complaint-modal textarea:focus {
+    outline: none;
+    border-color: var(--red);
+}
+
+/* -------------------------------------------- */
+/* Страница модерации (просмотр квеста)         */
+/* -------------------------------------------- */
+.review-container {
+    max-width: 1400px;
+    margin: 32px auto;
+    padding: 0 24px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    margin-bottom: 24px;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    color: var(--yellow);
+}
+
+/* Шапка квеста */
+.quest-header {
+    background: var(--bg-card);
+    border-radius: 24px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+}
+
+.quest-header h1 {
+    font-size: 1.8rem;
+    margin-bottom: 16px;
+}
+
+.quest-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-pending {
+    background: rgba(0, 162, 232, 0.15);
+    color: var(--electric-blue);
+    border: 1px solid var(--electric-blue);
+}
+
+/* Основная сетка */
+.review-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 28px;
+}
+
+/* Левая колонка */
+.left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.info-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid var(--border);
+}
+
+.info-card h3 {
+    color: var(--yellow);
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 16px;
+}
+
+.info-label {
+    width: 130px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.info-value {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.difficulty-stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.categories-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.category-badge {
+    background: rgba(255, 255, 27, 0.15);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: var(--yellow);
+}
+
+.cover-image {
+    width: 100%;
+    border-radius: 16px;
+    margin-top: 8px;
+}
+
+/* Правая колонка - карта и чекпоинты */
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.map-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 0;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.map-card h3 {
+    color: var(--yellow);
+    margin: 0;
+    padding: 18px 24px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-dark);
+}
+
+#reviewMap {
+    height: 380px;
+    width: 100%;
+}
+
+.checkpoints-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.checkpoints-card h3 {
+    color: var(--yellow);
+    margin: 0;
+    padding: 18px 24px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-dark);
+}
+
+.checkpoints-list {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.checkpoint-item {
+    background: var(--bg-dark);
+    border-radius: 16px;
+    padding: 18px;
+    border-left: 3px solid var(--yellow);
+    transition: 0.2s;
+}
+
+.checkpoint-item:hover {
+    transform: translateX(4px);
+}
+
+.checkpoint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.checkpoint-number {
+    font-weight: 800;
+    color: var(--yellow);
+    font-size: 0.9rem;
+}
+
+.checkpoint-type {
+    font-size: 0.65rem;
+    padding: 3px 10px;
+    background: rgba(255, 255, 27, 0.1);
+    border-radius: 20px;
+    color: var(--yellow);
+}
+
+.checkpoint-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.checkpoint-task {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.checkpoint-answer {
+    background: rgba(128, 255, 2, 0.1);
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-top: 10px;
+    border-left: 2px solid var(--neon-green);
+}
+
+.checkpoint-coords {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.checkpoint-hints {
+    font-size: 0.75rem;
+    color: var(--cyan);
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.hint-tag {
+    background: rgba(0, 211, 244, 0.1);
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+/* Кнопки действий модерации */
+.action-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.reject-form {
+    background: rgba(237, 28, 36, 0.05);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid var(--red);
+    display: none;
+}
+
+.reject-form.active {
+    display: block;
+    animation: fadeInUp 0.3s ease;
+}
+
+.reject-form textarea {
+    width: 100%;
+    padding: 14px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--text-primary);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    margin: 12px 0;
+    resize: vertical;
+}
+
+.reject-form textarea:focus {
+    outline: none;
+    border-color: var(--red);
+}
+
+.empty-checkpoints {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+/* -------------------------------------------- */
+/* Адаптивность (медиа-запросы)                 */
+/* -------------------------------------------- */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 24px;
+    }
+    
+    .quest-content-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quest-sidebar {
+        position: static;
+    }
+    
+    .action-card {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .quests-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .filters-sidebar {
+        width: 100%;
+        position: static;
+    }
+    
+    .main-layout {
+        flex-direction: column;
+    }
+    
+    .profile-header {
+        padding: 30px;
+    }
+    
+    .profile-name-row h2 {
+        font-size: 1.6rem;
+    }
+    
+    .avatar-circle {
+        width: 120px;
+        height: 120px;
+        font-size: 3rem;
+    }
+    
+    .stats-grid-full {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .review-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-row {
+        flex-direction: column;
+    }
+    
+    .info-label {
+        width: 100%;
+        margin-bottom: 6px;
+    }
+    
+    .play-container {
+        padding: 0 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 20px;
+    }
+    
+    .nav-links {
+        display: none;
+    }
+    
+    .burger-btn {
+        display: block;
+    }
+    
+    .header-controls {
+        display: none;
+    }
+    
+    .quests-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px;
+    }
+    
+    .profile-name-row {
+        justify-content: center;
+    }
+    
+    .profile-name-row h2 {
+        text-align: center;
+    }
+    
+    .birthdate {
+        justify-content: center;
+    }
+    
+    .stats-grid {
+        justify-content: center;
+    }
+    
+    .stats-grid-full {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .stats-grid-full .stat-card {
+        padding: 16px 12px;
+    }
+    
+    .stats-grid-full .stat-card .number {
+        font-size: 1.5rem;
+    }
+    
+    .stats-grid-full .stat-card i {
+        font-size: 1.5rem;
+    }
+    
+    .quest-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .quest-item-actions {
+        justify-content: center;
+    }
+    
+    .profile-tabs {
+        justify-content: center;
+    }
+    
+    .tab-btn {
+        padding: 8px 20px;
+        font-size: 0.85rem;
+    }
+    
+    .team-actions {
+        justify-content: center;
+    }
+    
+    .achievement-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        gap: 24px;
+    }
+    
+    .quest-hero-cover {
+        height: 300px;
+    }
+    
+    .quest-hero-content {
+        padding: 24px;
+    }
+    
+    .quest-detail-title {
+        font-size: 1.8rem;
+    }
+    
+    .detail-block {
+        padding: 18px;
+    }
+    
+    .modal-content {
+        padding: 24px;
+        width: 95%;
+    }
+    
+    .ranking-header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .tab-btn-ranking {
+        padding: 10px 20px;
+        font-size: 0.8rem;
+    }
+    
+    .ranking-table th,
+    .ranking-table td {
+        padding: 12px 16px;
+        font-size: 0.8rem;
+    }
+    
+    .ranking-table td:first-child {
+        width: 60px;
+    }
+    
+    .form-section {
+        padding: 20px;
+    }
+    
+    .form-section h2 {
+        font-size: 1.2rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+    
+    .categories-grid {
+        gap: 8px;
+    }
+    
+    .category-checkbox {
+        padding: 6px 12px;
+    }
+    
+    .category-checkbox span:last-child {
+        font-size: 0.75rem;
+    }
+    
+    .step-actions {
+        flex-direction: column;
+    }
+    
+    .step-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .preview-meta {
+        gap: 10px;
+    }
+    
+    .preview-content {
+        padding: 16px;
+    }
+    
+    .preview-content h3 {
+        font-size: 1.1rem;
+    }
+    
+    .answer-option {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .radio-label {
+        justify-content: flex-start;
+    }
+    
+    .team-info {
+        flex-direction: column;
+    }
+    
+    .team-stats {
+        width: 100%;
+        justify-content: space-around;
+    }
+    
+    .member-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .member-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .member-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .invite-code {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .code-display {
+        text-align: center;
+    }
+    
+    .play-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .progress-block {
+        align-items: center;
+    }
+    
+    .task-container {
+        padding: 20px;
+    }
+    
+    .task-title-left h3 {
+        font-size: 1.2rem;
+    }
+    
+    .circle {
+        width: 40px;
+        height: 40px;
+        font-size: 0.85rem;
+    }
+    
+    .completion-stats {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .review-container {
+        padding: 0 16px;
+    }
+    
+    .quest-header {
+        padding: 20px;
+    }
+    
+    .quest-header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .info-card, .checkpoints-card, .map-card {
+        padding: 0;
+    }
+    
+    .checkpoints-list {
+        padding: 16px;
+    }
+}
+
 @media (max-width: 560px) {
     .auth-card {
         padding: 32px 24px;
@@ -2901,6 +3713,88 @@ body {
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding: 0 16px;
+    }
+    
+    .stat-card {
+        padding: 12px 18px;
+        min-width: 90px;
+    }
+    
+    .stat-card .number {
+        font-size: 1.4rem;
+    }
+    
+    .stat-card i {
+        font-size: 1.4rem;
+    }
+    
+    .stats-grid-full {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stats-grid-full .stat-card {
+        padding: 12px 8px;
+    }
+    
+    .stats-grid-full .stat-card .number {
+        font-size: 1.2rem;
+    }
+    
+    .edit-birthdate-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+    
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+    }
+    
+    .profile-name-row h2 {
+        font-size: 1.4rem;
+    }
+    
+    .quest-hero-cover {
+        height: 250px;
+    }
+    
+    .quest-detail-title {
+        font-size: 1.5rem;
+    }
+    
+    .modal-content {
+        padding: 20px;
+    }
+    
+    .form-input, .form-textarea {
+        padding: 12px 14px;
+        font-size: 0.85rem;
+    }
+    
+    .ranking-header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .tab-switch {
+        gap: 10px;
+    }
+    
+    .tab-btn-ranking {
+        padding: 8px 16px;
+        font-size: 0.75rem;
+    }
+    
+    .ranking-table th,
+    .ranking-table td {
+        padding: 10px 12px;
+        font-size: 0.75rem;
+    }
+    
     .auth-card {
         padding: 28px 20px;
     }
@@ -2914,4 +3808,567 @@ body {
     .auth-btn {
         padding: 12px !important;
     }
+}
+
+/* -------------------------------------------- */
+/* Анимации                                     */
+/* -------------------------------------------- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.quest-card {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* Стили для страницы модератора */
+.moderation-header {
+    margin: 24px 0 32px;
+}
+
+.moderation-header h1 {
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.moderation-header h1 i {
+    color: var(--yellow);
+}
+
+.moderation-header p {
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+/* Статистика */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 24px 20px;
+    text-align: center;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+}
+
+.stat-card:hover {
+    border-color: var(--yellow);
+    transform: translateY(-3px);
+}
+
+.stat-card i {
+    font-size: 2rem;
+    color: var(--yellow);
+    margin-bottom: 12px;
+}
+
+.stat-card .number {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.stat-card .label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+/* Табы */
+.tabs-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    border-bottom: 2px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 12px 28px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    transition: 0.2s;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab-btn:hover {
+    color: var(--yellow);
+}
+
+.tab-btn.active {
+    color: var(--yellow);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--yellow);
+    border-radius: 3px;
+}
+
+/* Панель фильтров */
+.filters-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.search-wrapper {
+    position: relative;
+    flex: 1;
+    max-width: 320px;
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px 12px 40px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    color: var(--text-primary);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    transition: 0.2s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--yellow);
+}
+
+.sort-wrapper {
+    min-width: 200px;
+}
+
+/* Список квестов */
+.quests-table {
+    background: var(--bg-card);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 3fr 1.5fr 1.5fr 1.5fr 1fr;
+    padding: 16px 20px;
+    background: var(--bg-dark);
+    border-bottom: 1px solid var(--border);
+    color: var(--yellow);
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.quest-row {
+    display: grid;
+    grid-template-columns: 3fr 1.5fr 1.5fr 1.5fr 1fr;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    transition: 0.2s;
+    align-items: center;
+}
+
+.quest-row:last-child {
+    border-bottom: none;
+}
+
+.quest-row:hover {
+    background: rgba(255, 255, 27, 0.03);
+}
+
+.quest-title {
+    font-weight: 600;
+}
+
+.quest-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quest-date {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.status-pending {
+    background: rgba(0, 162, 232, 0.15);
+    color: var(--electric-blue);
+    border: 1px solid var(--electric-blue);
+}
+
+.status-approved {
+    background: rgba(128, 255, 2, 0.15);
+    color: var(--neon-green);
+    border: 1px solid var(--neon-green);
+}
+
+.status-rejected {
+    background: rgba(237, 28, 36, 0.15);
+    color: var(--red);
+    border: 1px solid var(--red);
+}
+
+.view-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 6px 14px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.view-btn:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .table-header, .quest-row {
+        grid-template-columns: 2fr 1.5fr 1.5fr 1.5fr 1fr;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .table-header {
+        display: none;
+    }
+    
+    .quest-row {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .quest-author, .quest-date, .status-badge, .view-btn {
+        justify-content: center;
+    }
+    
+    .filters-panel {
+        flex-direction: column;
+    }
+    
+    .search-wrapper {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .sort-wrapper {
+        width: 100%;
+    }
+    
+    .tabs-container {
+        justify-content: center;
+    }
+}
+
+
+/* ============================================ */
+/* КАСТОМИЗАЦИЯ СКРОЛЛБАРОВ                     */
+/* ============================================ */
+
+/* -------------------------------------------- */
+/* Основные стили для всех скроллбаров          */
+/* -------------------------------------------- */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--orange);
+}
+
+/* -------------------------------------------- */
+/* Стили для Firefox                           */
+/* -------------------------------------------- */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--yellow) var(--border);
+}
+
+/* -------------------------------------------- */
+/* Стили для модальных окон                     */
+/* -------------------------------------------- */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--orange);
+}
+
+/* -------------------------------------------- */
+/* Стили для списка чекпоинтов                  */
+/* -------------------------------------------- */
+.checkpoints-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.checkpoints-list::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.checkpoints-list::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+.checkpoints-list::-webkit-scrollbar-thumb:hover {
+    background: var(--orange);
+}
+
+/* -------------------------------------------- */
+/* Стили для таблиц рейтинга (при горизонтальной прокрутке) */
+/* -------------------------------------------- */
+.table-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--orange);
+}
+
+/* -------------------------------------------- */
+/* Стили для боковой панели фильтров            */
+/* -------------------------------------------- */
+.filters-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.filters-sidebar::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.filters-sidebar::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+/* -------------------------------------------- */
+/* Стили для страницы прохождения квеста        */
+/* -------------------------------------------- */
+.hints-section::-webkit-scrollbar {
+    width: 4px;
+}
+
+.hints-section::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.hints-section::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+/* -------------------------------------------- */
+/* Стили для страницы модерации (чекпоинты)     */
+/* -------------------------------------------- */
+.checkpoints-list-detail::-webkit-scrollbar {
+    width: 6px;
+}
+
+.checkpoints-list-detail::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.checkpoints-list-detail::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+/* -------------------------------------------- */
+/* Стили для текстовых полей с прокруткой       */
+/* -------------------------------------------- */
+textarea::-webkit-scrollbar {
+    width: 6px;
+}
+
+textarea::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+/* -------------------------------------------- */
+/* Стили для достижений (если будет прокрутка)  */
+/* -------------------------------------------- */
+.achievement-grid::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.achievement-grid::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.achievement-grid::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+/* -------------------------------------------- */
+/* Стили для мобильного меню                    */
+/* -------------------------------------------- */
+.mobile-menu::-webkit-scrollbar {
+    width: 4px;
+}
+
+.mobile-menu::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.mobile-menu::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+/* -------------------------------------------- */
+/* Стили для категорий (горизонтальная прокрутка на мобильных) */
+/* -------------------------------------------- */
+.categories-row::-webkit-scrollbar {
+    height: 4px;
+}
+
+.categories-row::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.categories-row::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+/* -------------------------------------------- */
+/* Стили для предпросмотра на странице создания */
+/* -------------------------------------------- */
+.preview-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.preview-content::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.preview-content::-webkit-scrollbar-thumb {
+    background: var(--yellow);
+    border-radius: 10px;
+}
+
+.captain-btn {
+    width: 320px;
 }

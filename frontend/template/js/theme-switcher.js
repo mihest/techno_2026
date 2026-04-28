@@ -1,5 +1,3 @@
-// Imprezzio: Path - Переключатель тем
-
 const themes = {
     'default': 'themes/theme-default.css',
     'neon-sunset': 'themes/theme-neon-sunset.css',
