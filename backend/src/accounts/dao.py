@@ -37,14 +37,15 @@ class UserDAO(BaseDAO[UserModel, UserCreateDB, UserUpdateDB]):
             create_data = obj_in
         else:
             create_data = obj_in.model_dump(exclude_unset=True)
-
+        print(create_data)
         try:
             stmt = insert(cls.model).values(**create_data).returning(cls.model)
             result = await session.execute(stmt)
             return result.scalars().first()
         except IntegrityError as e:
             raise HTTPException(status_code=400, detail="This username is already busy")
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
+            print(e)
             raise DatabaseException
         except Exception:
             raise UnknownDatabaseException
