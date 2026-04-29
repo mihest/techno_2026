@@ -1,194 +1,485 @@
-// Данные квестов
-const questsData = [
-    { id: 1, title: "Тайны Старого Арбата", description: "Прогулка по историческим переулкам с загадками прошлого", cover: "https://picsum.photos/id/104/400/200", district: "Арбат", city: "Москва", difficulty: 3, duration: 90, checkpoints: 5, ageGroup: "15-16", categories: ["history", "urban"], status: "active", createdAt: "2025-03-15" },
-    { id: 2, title: "Техно-квест Цифровой мир", description: "Исследуй технопарк и реши технологические головоломки", cover: "https://picsum.photos/id/0/400/200", district: "Сколково", city: "Москва", difficulty: 4, duration: 120, checkpoints: 7, ageGroup: "16-17", categories: ["tech"], status: "active", createdAt: "2025-03-20" },
-    { id: 3, title: "Граффити-тур", description: "Найди лучшие уличные работы и узнай истории их создания", cover: "https://picsum.photos/id/96/400/200", district: "Центр", city: "СПб", difficulty: 2, duration: 60, checkpoints: 4, ageGroup: "14-15", categories: ["art", "urban"], status: "active", createdAt: "2025-03-10" },
-    { id: 4, title: "Заброшенный завод", description: "Мистическое приключение по индустриальным руинам", cover: "https://picsum.photos/id/15/400/200", district: "Красный Октябрь", city: "Волгоград", difficulty: 5, duration: 150, checkpoints: 8, ageGroup: "18plus", categories: ["urban", "mystic"], status: "active", createdAt: "2025-03-05" },
-    { id: 5, title: "Гастрономический квест", description: "Попробуй лучшие уличные закуски", cover: "https://picsum.photos/id/30/400/200", district: "Китай-город", city: "Москва", difficulty: 2, duration: 75, checkpoints: 5, ageGroup: "14-15", categories: ["food", "urban"], status: "active", createdAt: "2025-03-18" },
-    { id: 6, title: "Спортивный QR-челлендж", description: "Физическая активность + головоломки", cover: "https://picsum.photos/id/20/400/200", district: "Сокольники", city: "Москва", difficulty: 4, duration: 100, checkpoints: 6, ageGroup: "16-17", categories: ["sport", "urban"], status: "active", createdAt: "2025-03-12" },
-    { id: 7, title: "Архитектурный код", description: "Разгадай тайны модернизма и сталинских высоток", cover: "https://picsum.photos/id/12/400/200", district: "Центр", city: "Москва", difficulty: 3, duration: 85, checkpoints: 5, ageGroup: "15-16", categories: ["history", "urban"], status: "active", createdAt: "2025-02-20" },
-    { id: 8, title: "Музыкальный перекресток", description: "Места известных музыкантов", cover: "https://picsum.photos/id/29/400/200", district: "Василеостровский", city: "СПб", difficulty: 1, duration: 50, checkpoints: 4, ageGroup: "14-15", categories: ["art"], status: "active", createdAt: "2025-03-08" },
-    { id: 9, title: "Научный квест Оптика", description: "Физические опыты и эксперименты", cover: "https://picsum.photos/id/1/400/200", district: "Воробьёвы горы", city: "Москва", difficulty: 4, duration: 110, checkpoints: 6, ageGroup: "16-17", categories: ["tech"], status: "active", createdAt: "2025-03-14" },
-    { id: 10, title: "Киберпанк-район", description: "Неоновые улицы и инсталляции", cover: "https://picsum.photos/id/4/400/200", district: "Деловой центр", city: "Москва", difficulty: 5, duration: 135, checkpoints: 7, ageGroup: "18plus", categories: ["urban", "tech"], status: "active", createdAt: "2025-03-17" },
-    { id: 11, title: "Эко-тропа Лосиный остров", description: "Природа в мегаполисе", cover: "https://picsum.photos/id/15/400/200", district: "Лосиный остров", city: "Москва", difficulty: 2, duration: 70, checkpoints: 5, ageGroup: "14-15", categories: ["nature"], status: "active", createdAt: "2025-03-19" },
-    { id: 12, title: "Игровая индустрия", description: "Офисы разработчиков игр", cover: "https://picsum.photos/id/26/400/200", district: "Красная Пресня", city: "Москва", difficulty: 3, duration: 95, checkpoints: 5, ageGroup: "16-17", categories: ["tech"], status: "active", createdAt: "2025-03-16" }
-];
+const API_BASE_URL = (
+    window.AuthApi?.API_BASE_URL ||
+    window.AUTH_API_BASE_URL ||
+    localStorage.getItem('apiBaseUrl') ||
+    'https://mihest.ru/api'
+).replace(/\/$/, '');
+
+const AGE_GROUP_IDS = {
+    ...(window.AuthApi?.AGE_GROUP_IDS || {}),
+    ...(window.QUEST_AGE_GROUP_IDS || {}),
+    '14-15': '5705a746-c2fc-4cbe-98d2-a9e5c076f89b',
+};
+
+const AGE_GROUP_LABELS = {
+    under14: 'Мне нет 14',
+    '14-15': '14-15 лет',
+    '15-16': '15-16 лет',
+    '16-17': '16-17 лет',
+    '18plus': 'Мне есть 18',
+    '5705a746-c2fc-4cbe-98d2-a9e5c076f89b': '14-15 лет',
+};
+
+const SORT_MAP = {
+    new: { sort_by: 'created_at', sort_order: 'desc' },
+    old: { sort_by: 'created_at', sort_order: 'asc' },
+    hard: { sort_by: 'difficulty', sort_order: 'desc' },
+    easy: { sort_by: 'difficulty', sort_order: 'asc' },
+};
 
 let currentPage = 1;
-let itemsPerPage = 9;
+let totalItems = 0;
+const itemsPerPage = 9;
+let requestVersion = 0;
+
 let currentFilters = {
-    categories: [],
+    category: '',
     difficulty: 'all',
     age: 'all',
-    maxDuration: 240,
+    durationBucket: 'all',
     nearMe: false,
     radius: 1000,
-    sort: 'new'
+    location: null,
+    sort: 'new',
 };
+
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function escapeAttr(value) {
+    return escapeHtml(value).replace(/`/g, '&#096;');
+}
 
 function getDifficultyStars(difficulty) {
     let stars = '';
+    const level = Number(difficulty) || 0;
+
     for (let i = 1; i <= 5; i++) {
-        stars += i <= difficulty ? '<i class="fas fa-star star-active"></i>' : '<i class="fas fa-star star-inactive"></i>';
+        stars += i <= level
+            ? '<i class="fas fa-star star-active"></i>'
+            : '<i class="fas fa-star star-inactive"></i>';
     }
+
     return stars;
 }
 
 function getDifficultyLevel(difficulty) {
-    if (difficulty <= 2) return 'Мне только спросить';
-    if (difficulty === 3) return 'Я бы ещё поиграл';
+    const level = Number(difficulty) || 0;
+    if (level <= 2) return 'Мне только спросить';
+    if (level === 3) return 'Я бы ещё поиграл';
     return 'Работают профи';
 }
 
-function getCategoryName(cat) {
-    const names = { history: 'История', urban: 'Город', tech: 'Техно', nature: 'Природа', art: 'Искусство', food: 'Еда', mystic: 'Мистика', sport: 'Спорт' };
-    return names[cat] || cat;
+function getAgeGroupId(value) {
+    if (!value || value === 'all') return null;
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)) {
+        return value;
+    }
+
+    return AGE_GROUP_IDS[value] || null;
 }
 
-function filterQuests() {
-    let filtered = [...questsData];
-    
-    if (currentFilters.categories.length > 0) {
-        filtered = filtered.filter(q => q.categories.some(cat => currentFilters.categories.includes(cat)));
-    }
-    
-    if (currentFilters.difficulty !== 'all') {
-        if (currentFilters.difficulty === 'easy') filtered = filtered.filter(q => q.difficulty <= 2);
-        else if (currentFilters.difficulty === 'medium') filtered = filtered.filter(q => q.difficulty === 3);
-        else if (currentFilters.difficulty === 'hard') filtered = filtered.filter(q => q.difficulty >= 4);
-    }
-    
-    if (currentFilters.age !== 'all') {
-        filtered = filtered.filter(q => q.ageGroup === currentFilters.age);
-    }
-    
-    filtered = filtered.filter(q => q.duration <= currentFilters.maxDuration);
-    filtered = filtered.filter(q => q.status === 'active');
-    
-    switch(currentFilters.sort) {
-        case 'new': filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); break;
-        case 'old': filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); break;
-        case 'hard': filtered.sort((a, b) => b.difficulty - a.difficulty); break;
-        case 'easy': filtered.sort((a, b) => a.difficulty - b.difficulty); break;
-    }
-    
-    return filtered;
+function getAgeGroupLabel(quest) {
+    const value = quest.client_extra?.age_group?.label || quest.age_group_id;
+    return AGE_GROUP_LABELS[value] || value || 'Возраст не указан';
 }
 
-function renderQuests() {
-    const filtered = filterQuests();
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
-    const start = (currentPage - 1) * itemsPerPage;
-    const pageQuests = filtered.slice(start, start + itemsPerPage);
-    
+function resolveCoverUrl(coverFile) {
+    if (!coverFile) return '';
+    if (/^(https?:)?\/\//i.test(coverFile) || coverFile.startsWith('data:')) return coverFile;
+
+    const apiUrl = new URL(API_BASE_URL, window.location.origin);
+    if (coverFile.startsWith('/')) {
+        return `${apiUrl.origin}${coverFile}`;
+    }
+
+    return `${API_BASE_URL}/${coverFile.replace(/^\/+/, '')}`;
+}
+
+function getCoverMarkup(quest) {
+    const coverUrl = resolveCoverUrl(quest.cover_file);
+    if (coverUrl) {
+        return `<div class="quest-cover" style="background-image: url('${escapeAttr(coverUrl)}');"></div>`;
+    }
+
+    return `
+        <div class="quest-cover" style="background: linear-gradient(135deg, var(--bg-card), rgba(255,255,27,0.14)); display:flex; align-items:center; justify-content:center;">
+            <i class="fas fa-map-marked-alt" style="font-size:2rem; color:var(--yellow);"></i>
+        </div>
+    `;
+}
+
+function getCategoryTags(quest) {
+    const categories = [
+        quest.category,
+        ...(Array.isArray(quest.client_extra?.categories) ? quest.client_extra.categories : []),
+    ].filter(Boolean);
+    const uniqueCategories = [...new Set(categories)];
+
+    if (!uniqueCategories.length) {
+        return '<span class="category-tag">Квест</span>';
+    }
+
+    return uniqueCategories
+        .map((category) => `<span class="category-tag">${escapeHtml(category)}</span>`)
+        .join('');
+}
+
+function getPublishedDate(quest) {
+    const dateValue = quest.published_at || quest.created_at;
+    if (!dateValue) return '';
+
+    try {
+        return new Intl.DateTimeFormat('ru-RU', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+        }).format(new Date(dateValue));
+    } catch {
+        return '';
+    }
+}
+
+function getBackendErrorMessage(errorData, fallback = 'Ошибка запроса') {
+    const detail = errorData?.detail || errorData?.message;
+
+    if (typeof detail === 'string') return detail;
+    if (Array.isArray(detail)) {
+        return detail
+            .map((item) => {
+                if (typeof item === 'string') return item;
+                return item?.msg || item?.message || JSON.stringify(item);
+            })
+            .join('\n');
+    }
+    if (typeof errorData === 'string') return errorData;
+
+    return fallback;
+}
+
+function getAuthHeaders() {
+    try {
+        const session = JSON.parse(localStorage.getItem('imprezzio_auth') || 'null');
+        if (!session?.accessToken) return {};
+
+        return {
+            Authorization: `${session.tokenType || 'Bearer'} ${session.accessToken}`,
+        };
+    } catch {
+        return {};
+    }
+}
+
+function buildQuestQueryParams() {
+    const params = new URLSearchParams();
+    const sort = SORT_MAP[currentFilters.sort] || SORT_MAP.new;
+    const ageGroupId = getAgeGroupId(currentFilters.age);
+
+    params.set('status', 'Опубликовано');
+    params.set('sort_by', sort.sort_by);
+    params.set('sort_order', sort.sort_order);
+    params.set('from', String((currentPage - 1) * itemsPerPage));
+    params.set('count', String(itemsPerPage));
+
+    if (currentFilters.category) params.set('category', currentFilters.category);
+    if (currentFilters.difficulty !== 'all') params.set('difficulty', currentFilters.difficulty);
+    if (currentFilters.durationBucket !== 'all') params.set('duration_bucket', currentFilters.durationBucket);
+    if (ageGroupId) params.set('age_group_id', ageGroupId);
+
+    if (currentFilters.nearMe && currentFilters.location) {
+        params.set('latitude', String(currentFilters.location.latitude));
+        params.set('longitude', String(currentFilters.location.longitude));
+        params.set('radius_meters', String(currentFilters.radius || 1000));
+    }
+
+    return params;
+}
+
+async function fetchQuests() {
+    const params = buildQuestQueryParams();
+    const response = await fetch(`${API_BASE_URL}/quests?${params.toString()}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+            Accept: 'application/json',
+            ...getAuthHeaders(),
+        },
+    });
+
+    const contentType = response.headers.get('content-type') || '';
+    const data = contentType.includes('application/json')
+        ? await response.json()
+        : await response.text();
+
+    if (!response.ok) {
+        throw new Error(getBackendErrorMessage(data, `HTTP ${response.status}`));
+    }
+
+    return data;
+}
+
+function renderLoading() {
     const grid = document.getElementById('questsGrid');
-    if (pageQuests.length === 0) {
-        grid.innerHTML = `<div class="empty-state"><i class="fas fa-map-marked-alt"></i><p>Квестов не найдено</p><p>Попробуйте изменить параметры фильтрации</p></div>`;
-    } else {
-        grid.innerHTML = pageQuests.map(quest => `
+    if (!grid) return;
+
+    grid.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Загружаем квесты...</p>
+        </div>
+    `;
+    document.getElementById('pagination').innerHTML = '';
+}
+
+function renderError(message) {
+    const grid = document.getElementById('questsGrid');
+    if (!grid) return;
+
+    grid.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-triangle-exclamation"></i>
+            <p>Не удалось загрузить квесты</p>
+            <p>${escapeHtml(message)}</p>
+        </div>
+    `;
+    document.getElementById('pagination').innerHTML = '';
+}
+
+function renderQuestsList(items) {
+    const grid = document.getElementById('questsGrid');
+    if (!grid) return;
+
+    if (!items.length) {
+        grid.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-map-marked-alt"></i>
+                <p>Квестов не найдено</p>
+                <p>Попробуйте изменить параметры фильтрации</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = items.map((quest) => {
+        const date = getPublishedDate(quest);
+        const description = quest.description || 'Описание квеста пока не заполнено';
+        const cityDistrict = quest.city_district || 'Локация не указана';
+
+        return `
             <div class="quest-card">
-                <div class="quest-cover" style="background-image: url('${quest.cover}');"></div>
+                ${getCoverMarkup(quest)}
                 <div class="quest-info">
-                    <h3 class="quest-title">${quest.title}</h3>
-                    <div class="categories-tags">
-                        ${quest.categories.map(c => `<span class="category-tag">${getCategoryName(c)}</span>`).join('')}
+                    <h3 class="quest-title">${escapeHtml(quest.title || 'Без названия')}</h3>
+                    <div class="categories-tags">${getCategoryTags(quest)}</div>
+                    <div class="quest-meta">
+                        <span><i class="fas fa-users"></i> ${escapeHtml(getAgeGroupLabel(quest))}</span>
+                        <span><i class="fas fa-clock"></i> ${Number(quest.duration_minutes) || 0} мин</span>
                     </div>
                     <div class="quest-meta">
-                        <span><i class="fas fa-users"></i> ${quest.ageGroup} лет</span>
-                        <span><i class="fas fa-clock"></i> ${quest.duration} мин</span>
-                        <span><i class="fas fa-map-marker-alt"></i> ${quest.checkpoints} точек</span>
+                        <span><i class="fas fa-location-dot"></i> ${escapeHtml(cityDistrict)}</span>
+                        ${date ? `<span><i class="fas fa-calendar"></i> ${escapeHtml(date)}</span>` : ''}
                     </div>
                     <div class="quest-meta">
                         <span class="difficulty-stars">${getDifficultyStars(quest.difficulty)}</span>
                         <span>${getDifficultyLevel(quest.difficulty)}</span>
                     </div>
-                    <p class="quest-description">${quest.description}</p>
+                    <p class="quest-description">${escapeHtml(description)}</p>
                     <div class="quest-buttons">
-                        <button class="btn btn-primary" onclick="startQuest(${quest.id})"><i class="fas fa-play"></i> Начать</button>
-                        <button class="btn btn-outline" onclick="showQuestDetail(${quest.id})"><i class="fas fa-info-circle"></i> Детали</button>
+                        <button class="btn btn-primary" onclick="startQuest('${escapeAttr(quest.id)}')"><i class="fas fa-play"></i> Начать</button>
+                        <button class="btn btn-outline" onclick="showQuestDetail('${escapeAttr(quest.id)}')"><i class="fas fa-info-circle"></i> Детали</button>
                     </div>
                 </div>
             </div>
-        `).join('');
-    }
-    
+        `;
+    }).join('');
+}
+
+function renderPagination() {
     const paginationDiv = document.getElementById('pagination');
+    if (!paginationDiv) return;
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
     if (totalPages <= 1) {
         paginationDiv.innerHTML = '';
         return;
     }
-    
-    let pagHtml = `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
-    for (let i = 1; i <= totalPages; i++) {
-        pagHtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+
+    const pages = [];
+    const start = Math.max(1, currentPage - 2);
+    const end = Math.min(totalPages, currentPage + 2);
+
+    if (start > 1) pages.push(1);
+    if (start > 2) pages.push('...');
+    for (let page = start; page <= end; page++) pages.push(page);
+    if (end < totalPages - 1) pages.push('...');
+    if (end < totalPages) pages.push(totalPages);
+
+    const pageButtons = pages.map((page) => {
+        if (page === '...') return '<span class="page-btn" style="pointer-events:none;">...</span>';
+        return `<button class="page-btn ${page === currentPage ? 'active' : ''}" onclick="changePage(${page})">${page}</button>`;
+    }).join('');
+
+    paginationDiv.innerHTML = `
+        <button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>
+        ${pageButtons}
+        <button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>
+    `;
+}
+
+async function loadQuests() {
+    const version = ++requestVersion;
+    renderLoading();
+
+    try {
+        const result = await fetchQuests();
+        if (version !== requestVersion) return;
+
+        const items = Array.isArray(result?.items) ? result.items : [];
+        totalItems = Number(result?.total) || items.length;
+        window.lastQuestsResponse = result;
+
+        renderQuestsList(items);
+        renderPagination();
+    } catch (error) {
+        if (version !== requestVersion) return;
+        console.error('Quests load failed', error);
+        renderError(error.message);
     }
-    pagHtml += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
-    paginationDiv.innerHTML = pagHtml;
 }
 
 function changePage(page) {
-    const filtered = filterQuests();
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
     if (page >= 1 && page <= totalPages) {
         currentPage = page;
-        renderQuests();
+        loadQuests();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
-function startQuest(questId) { window.location.href = `quest-play.html?id=${questId}`; }
-function showQuestDetail(questId) { window.location.href = `quest-detail.html?id=${questId}`; }
+function startQuest(questId) {
+    window.location.href = `quest-play.html?id=${encodeURIComponent(questId)}`;
+}
+
+function showQuestDetail(questId) {
+    window.location.href = `quest-detail.html?id=${encodeURIComponent(questId)}`;
+}
+
+function getCurrentLocation() {
+    return new Promise((resolve, reject) => {
+        if (!('geolocation' in navigator)) {
+            reject(new Error('Геолокация не поддерживается браузером'));
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => resolve({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+            }),
+            () => reject(new Error('Не удалось получить местоположение')),
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+        );
+    });
+}
+
+function reloadFromFirstPage() {
+    currentPage = 1;
+    loadQuests();
+}
 
 function initFilters() {
-    document.querySelectorAll('.category-chip').forEach(el => {
-        el.addEventListener('click', () => {
-            const cat = el.dataset.cat;
-            const idx = currentFilters.categories.indexOf(cat);
-            idx === -1 ? currentFilters.categories.push(cat) : currentFilters.categories.splice(idx, 1);
-            el.classList.toggle('active');
-            currentPage = 1;
-            renderQuests();
+    document.querySelectorAll('.category-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+            const category = chip.dataset.cat;
+            const isActive = currentFilters.category === category;
+
+            document.querySelectorAll('.category-chip').forEach((item) => item.classList.remove('active'));
+            currentFilters.category = isActive ? '' : category;
+            if (!isActive) chip.classList.add('active');
+
+            reloadFromFirstPage();
         });
     });
-    
-    document.getElementById('difficultySelect').addEventListener('change', (e) => { currentFilters.difficulty = e.target.value; currentPage = 1; renderQuests(); });
-    document.getElementById('ageSelect').addEventListener('change', (e) => { currentFilters.age = e.target.value; currentPage = 1; renderQuests(); });
-    document.getElementById('durationSelect').addEventListener('change', (e) => {
-        currentFilters.maxDuration = e.target.value === 'all' ? 240 : parseInt(e.target.value);
-        currentPage = 1;
-        renderQuests();
+
+    document.getElementById('difficultySelect').addEventListener('change', (event) => {
+        currentFilters.difficulty = event.target.value;
+        reloadFromFirstPage();
     });
-    document.getElementById('sortSelect').addEventListener('change', (e) => { currentFilters.sort = e.target.value; currentPage = 1; renderQuests(); });
-    
+
+    document.getElementById('ageSelect').addEventListener('change', (event) => {
+        currentFilters.age = event.target.value;
+        reloadFromFirstPage();
+    });
+
+    document.getElementById('durationSelect').addEventListener('change', (event) => {
+        currentFilters.durationBucket = event.target.value;
+        reloadFromFirstPage();
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', (event) => {
+        currentFilters.sort = event.target.value;
+        reloadFromFirstPage();
+    });
+
     const nearMeCheckbox = document.getElementById('nearMeCheckbox');
     const radiusContainer = document.getElementById('radiusContainer');
-    nearMeCheckbox.addEventListener('change', (e) => {
-        currentFilters.nearMe = e.target.checked;
-        radiusContainer.classList.toggle('active', e.target.checked);
-        if (e.target.checked && 'geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => console.log('Location:', pos.coords),
-                () => alert('Не удалось получить местоположение')
-            );
+    nearMeCheckbox.addEventListener('change', async (event) => {
+        currentFilters.nearMe = event.target.checked;
+        radiusContainer.classList.toggle('active', event.target.checked);
+
+        if (event.target.checked) {
+            try {
+                currentFilters.location = await getCurrentLocation();
+            } catch (error) {
+                alert(error.message);
+                currentFilters.nearMe = false;
+                currentFilters.location = null;
+                nearMeCheckbox.checked = false;
+                radiusContainer.classList.remove('active');
+            }
+        } else {
+            currentFilters.location = null;
         }
-        renderQuests();
+
+        reloadFromFirstPage();
     });
-    
-    document.getElementById('radiusValue').addEventListener('change', (e) => { currentFilters.radius = parseInt(e.target.value); renderQuests(); });
-    
+
+    document.getElementById('radiusValue').addEventListener('change', (event) => {
+        currentFilters.radius = Number.parseInt(event.target.value, 10) || 1000;
+        if (currentFilters.nearMe) reloadFromFirstPage();
+    });
+
     document.getElementById('resetFilters').addEventListener('click', () => {
-        currentFilters = { categories: [], difficulty: 'all', age: 'all', maxDuration: 240, nearMe: false, radius: 1000, sort: 'new' };
-        document.querySelectorAll('.category-chip').forEach(el => el.classList.remove('active'));
+        currentFilters = {
+            category: '',
+            difficulty: 'all',
+            age: 'all',
+            durationBucket: 'all',
+            nearMe: false,
+            radius: 1000,
+            location: null,
+            sort: 'new',
+        };
+
+        document.querySelectorAll('.category-chip').forEach((chip) => chip.classList.remove('active'));
         document.getElementById('difficultySelect').value = 'all';
         document.getElementById('ageSelect').value = 'all';
         document.getElementById('durationSelect').value = 'all';
         document.getElementById('sortSelect').value = 'new';
         document.getElementById('nearMeCheckbox').checked = false;
+        document.getElementById('radiusValue').value = '1000';
         document.getElementById('radiusContainer').classList.remove('active');
-        currentPage = 1;
-        renderQuests();
+
+        reloadFromFirstPage();
     });
 }
 
-renderQuests();
 initFilters();
+loadQuests();

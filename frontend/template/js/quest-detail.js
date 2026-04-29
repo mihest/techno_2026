@@ -1,14 +1,32 @@
+const API_BASE_URL = (
+    window.AuthApi?.API_BASE_URL ||
+    window.AUTH_API_BASE_URL ||
+    localStorage.getItem('apiBaseUrl') ||
+    'https://mihest.ru/api'
+).replace(/\/$/, '');
+
+const AGE_GROUP_LABELS = {
+    under14: 'Мне нет 14',
+    '14-15': '14-15 лет',
+    '15-16': '15-16 лет',
+    '16-17': '16-17 лет',
+    '18plus': 'Мне есть 18',
+    '5705a746-c2fc-4cbe-98d2-a9e5c076f89b': '14-15 лет',
+};
+
+let questDetailData = null;
+
 // Модальное окно жалобы
 const reportModal = document.getElementById('reportModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
 
-window.showReportModal = function() {
-    reportModal.classList.add('active');
+window.showReportModal = function () {
+    reportModal?.classList.add('active');
     document.body.style.overflow = 'hidden';
-}
+};
 
 function closeReportModal() {
-    reportModal.classList.remove('active');
+    reportModal?.classList.remove('active');
     document.body.style.overflow = '';
 }
 
@@ -22,25 +40,105 @@ if (reportModal) {
     });
 }
 
-// Данные квеста
-const urlParams = new URLSearchParams(window.location.search);
-const questId = parseInt(urlParams.get('id')) || 1;
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 
-const questDetailData = {
-    id: questId,
-    title: "Тайны Старого Арбата",
-    description: "Увлекательный квест по историческим переулкам Арбата. Вам предстоит найти тайные знаки, разгадать загадки прошлого и узнать интересные факты о знаменитых жителях этого района. Маршрут проходит через самые живописные места, включая легендарные дворики и памятники архитектуры.",
-    cover: "https://picsum.photos/id/104/1200/500",
-    district: "Арбат",
-    city: "Москва",
-    difficulty: 3,
-    duration: 90,
-    checkpoints: 5,
-    ageGroup: "15-16",
-    rules: "1. Следуйте указаниям карты\n2. На каждом чекпоинте отвечайте на вопросы\n3. Используйте подсказки только в крайнем случае\n4. Соблюдайте правила дорожного движения\n5. Уважайте местных жителей",
-    warnings: "Будьте внимательны на пешеходных переходах! Возьмите с собой воду и заряженный телефон. В некоторых местах может не работать мобильный интернет.",
-    whatToTake: "• Заряженный смартфон\n• Наушники\n• Бутылка воды\n• Удобная обувь\n• Зарядное устройство (power bank)"
-};
+function escapeAttr(value) {
+    return escapeHtml(value).replace(/`/g, '&#096;');
+}
+
+function formatText(value) {
+    return escapeHtml(value).replace(/\n/g, '<br>');
+}
+
+function getQuestId() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id') || params.get('quest_id');
+}
+
+function getBackendErrorMessage(errorData, fallback = 'Ошибка запроса') {
+    const detail = errorData?.detail || errorData?.message;
+
+    if (typeof detail === 'string') return detail;
+    if (Array.isArray(detail)) {
+        return detail
+            .map((item) => {
+                if (typeof item === 'string') return item;
+                return item?.msg || item?.message || JSON.stringify(item);
+            })
+            .join('\n');
+    }
+    if (typeof errorData === 'string') return errorData;
+
+    return fallback;
+}
+
+async function fetchQuestById(questId) {
+    if (window.AuthApi?.authorizedFetch) {
+        return window.AuthApi.authorizedFetch(`/quests/${encodeURIComponent(questId)}`, {
+            method: 'GET',
+            headers: { Accept: 'application/json' },
+        });
+    }
+
+    const response = await fetch(`${API_BASE_URL}/quests/${encodeURIComponent(questId)}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include',
+        headers: { Accept: 'application/json' },
+    });
+
+    const contentType = response.headers.get('content-type') || '';
+    const data = contentType.includes('application/json')
+        ? await response.json()
+        : await response.text();
+
+    if (!response.ok) {
+        throw new Error(getBackendErrorMessage(data, `HTTP ${response.status}`));
+    }
+
+    return data;
+}
+
+function resolveCoverUrl(coverFile) {
+    if (!coverFile) return '';
+    if (/^(https?:)?\/\//i.test(coverFile) || coverFile.startsWith('data:')) return coverFile;
+
+    const apiUrl = new URL(API_BASE_URL, window.location.origin);
+    if (coverFile.startsWith('/')) {
+        return `${apiUrl.origin}${coverFile}`;
+    }
+
+    return `${API_BASE_URL}/${coverFile.replace(/^\/+/, '')}`;
+}
+
+function parseRulesWarning(value) {
+    const result = { rules: '', warnings: '', whatToTake: '', raw: value || '' };
+    if (!value) return result;
+
+    value.split('\n').forEach((line) => {
+        const [key, ...rest] = line.split(':');
+        const text = rest.join(':').trim();
+        if (!text) return;
+
+        if (/^warnings?$/i.test(key.trim())) result.warnings = text;
+        else if (/^rules?$/i.test(key.trim())) result.rules = text;
+        else if (/^what to take$/i.test(key.trim())) result.whatToTake = text;
+    });
+
+    return result;
+}
+
+function getAgeGroupLabel(quest) {
+    const value = quest.client_extra?.age_group?.label || quest.age_group_id;
+    return AGE_GROUP_LABELS[value] || value || 'Возраст не указан';
+}
 
 function getDifficultyStars(difficulty) {
     let stars = '';
@@ -58,19 +156,27 @@ function getDifficultyLevel(difficulty) {
 
 function renderQuestDetail() {
     const container = document.getElementById('questDetail');
-    if (!container) return;
-    
+    if (!container || !questDetailData) return;
+
+    const checkpoints = Array.isArray(questDetailData.checkpoints) ? questDetailData.checkpoints : [];
+    const rulesWarning = parseRulesWarning(questDetailData.rules_warning);
+    const coverUrl = resolveCoverUrl(questDetailData.cover_file);
+    const location = questDetailData.city_district || 'Локация не указана';
+    const rulesText = rulesWarning.rules || 'Правила не указаны';
+    const warningsText = rulesWarning.warnings || 'Предупреждения не указаны';
+    const whatToTakeText = rulesWarning.whatToTake || 'Список не указан';
+
     container.innerHTML = `
         <div class="quest-detail-wrapper">
             <div class="quest-hero">
-                <div class="quest-hero-cover" style="background-image: url('${questDetailData.cover}');">
+                <div class="quest-hero-cover" style="background-image: url('${escapeAttr(coverUrl || '')}');">
                     <div class="quest-hero-overlay"></div>
                 </div>
                 <div class="quest-hero-content">
-                    <h1 class="quest-detail-title">${questDetailData.title}</h1>
+                    <h1 class="quest-detail-title">${escapeHtml(questDetailData.title || 'Без названия')}</h1>
                     <div class="quest-location">
                         <i class="fas fa-map-marker-alt"></i>
-                        <span>${questDetailData.district}, ${questDetailData.city}</span>
+                        <span>${escapeHtml(location)}</span>
                     </div>
                 </div>
             </div>
@@ -88,32 +194,32 @@ function renderQuestDetail() {
                         </div>
                         <div class="info-chip">
                             <i class="fas fa-route"></i>
-                            <span>${questDetailData.checkpoints} точек</span>
+                            <span>${checkpoints.length} точек</span>
                         </div>
                         <div class="info-chip">
                             <i class="fas fa-users"></i>
-                            <span>${questDetailData.ageGroup} лет</span>
+                            <span>${escapeHtml(getAgeGroupLabel(questDetailData))}</span>
                         </div>
                     </div>
                     
                     <div class="detail-block">
                         <h3><i class="fas fa-book-open"></i> Описание</h3>
-                        <p>${questDetailData.description}</p>
+                        <p>${formatText(questDetailData.description || 'Описание не указано')}</p>
                     </div>
                     
                     <div class="detail-block">
                         <h3><i class="fas fa-gavel"></i> Правила</h3>
-                        <div class="content-box">${questDetailData.rules.replace(/\n/g, '<br>')}</div>
+                        <div class="content-box">${formatText(rulesText)}</div>
                     </div>
                     
                     <div class="detail-block">
                         <h3><i class="fas fa-exclamation-triangle"></i> Важные предупреждения</h3>
-                        <div class="alert alert-warning">${questDetailData.warnings}</div>
+                        <div class="alert alert-warning">${formatText(warningsText)}</div>
                     </div>
                     
                     <div class="detail-block">
                         <h3><i class="fas fa-backpack"></i> Что взять с собой</h3>
-                        <div class="content-box">${questDetailData.whatToTake.replace(/\n/g, '<br>')}</div>
+                        <div class="content-box">${formatText(whatToTakeText)}</div>
                     </div>
                 </div>
                 
@@ -138,7 +244,8 @@ function renderQuestDetail() {
 }
 
 function startQuest() {
-    window.location.href = `quest-play.html?id=${questDetailData.id}`;
+    if (!questDetailData?.id) return;
+    window.location.href = `quest-play.html?id=${encodeURIComponent(questDetailData.id)}`;
 }
 
 const reportForm = document.getElementById('reportForm');
@@ -151,4 +258,47 @@ if (reportForm) {
     });
 }
 
-renderQuestDetail();
+function renderLoading() {
+    const container = document.getElementById('questDetail');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="empty-state" style="padding: 40px 0;">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Загружаем квест...</p>
+        </div>
+    `;
+}
+
+function renderError(message) {
+    const container = document.getElementById('questDetail');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="empty-state" style="padding: 40px 0;">
+            <i class="fas fa-triangle-exclamation"></i>
+            <p>Не удалось загрузить квест</p>
+            <p>${escapeHtml(message)}</p>
+        </div>
+    `;
+}
+
+async function loadQuestDetail() {
+    const questId = getQuestId();
+    if (!questId) {
+        renderError('В адресе страницы нет id квеста');
+        return;
+    }
+
+    renderLoading();
+
+    try {
+        questDetailData = await fetchQuestById(questId);
+        renderQuestDetail();
+    } catch (error) {
+        console.error('Quest detail load failed', error);
+        renderError(error.message || 'Неизвестная ошибка');
+    }
+}
+
+loadQuestDetail();
