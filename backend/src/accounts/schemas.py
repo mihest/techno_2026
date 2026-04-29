@@ -99,3 +99,9 @@ class UserResponse(BaseModel):
     username: str
     role: UserRoleEnum
     is_deleted: bool
+
+
+class UserMeResponse(UserResponse):
+    quests_completed: int
+    rating: int
+    published_routes_count: int

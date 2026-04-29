@@ -101,17 +101,17 @@
         <div class="stats-grid-full">
             <div class="stat-card">
                 <i class="fas fa-flag-checkered"></i>
-                <div class="number">14</div>
+                <div class="number" id="statCompleted">0</div>
                 <div>пройдено</div>
             </div>
             <div class="stat-card">
                 <i class="fas fa-trophy"></i>
-                <div class="number">2,450</div>
+                <div class="number" id="statRating">0</div>
                 <div>очков</div>
             </div>
             <div class="stat-card">
                 <i class="fas fa-map-marked-alt"></i>
-                <div class="number">2</div>
+                <div class="number" id="statCreated">0</div>
                 <div>создано</div>
             </div>
         </div>
@@ -126,68 +126,12 @@
         
         <!-- Созданные квесты -->
         <div id="created-tab" class="tab-content active">
-            <div class="quest-item">
-                <div class="quest-item-info">
-                    <div class="quest-item-title">Тайны Старого Арбата</div>
-                    <div class="quest-item-meta">История, Архитектура • 5 чекпоинтов</div>
-                </div>
-                <div class="quest-item-actions">
-                    <span class="quest-status status-published"><i class="fas fa-check-circle"></i> Опубликован</span>
-                </div>
-            </div>
-            <div class="quest-item">
-                <div class="quest-item-info">
-                    <div class="quest-item-title">Техно-парк Будущего</div>
-                    <div class="quest-item-meta">Технологии, Наука • 7 чекпоинтов</div>
-                </div>
-                <div class="quest-item-actions">
-                    <span class="quest-status status-moderation"><i class="fas fa-hourglass-half"></i> На модерации</span>
-                </div>
-            </div>
-            <div class="quest-item">
-                <div class="quest-item-info">
-                    <div class="quest-item-title">Заброшенный чердак</div>
-                    <div class="quest-item-meta">Мистика • 4 чекпоинта</div>
-                </div>
-                <div class="quest-item-actions">
-                    <span class="quest-status status-draft"><i class="fas fa-pencil-alt"></i> Черновик</span>
-                    <button class="btn btn-primary btn-sm">Редактировать</button>
-                </div>
-            </div>
+            <div id="createdQuestsList"></div>
         </div>
         
         <!-- Пройденные квесты -->
         <div id="completed-tab" class="tab-content">
-            <div class="quest-item">
-                <div class="quest-item-info">
-                    <div class="quest-item-title">Исторический центр</div>
-                    <div class="quest-item-meta">Завершён соло • 12.04.2025</div>
-                </div>
-                <div class="quest-item-actions">
-                    <span class="quest-status status-published"><i class="fas fa-star"></i> 320 очков</span>
-                </div>
-            </div>
-            <div class="quest-item">
-                <div class="quest-item-info">
-                    <div class="quest-item-title">Техно-район</div>
-                    <div class="quest-item-meta">Завершён с командой "Энтузиасты" • 01.04.2025</div>
-                </div>
-                <div class="quest-item-actions">
-                    <span class="quest-status status-published"><i class="fas fa-star"></i> 450 очков</span>
-                </div>
-            </div>
-            <div class="quest-item">
-                <div class="quest-item-info">
-                    <div class="quest-item-title">Архитектурный код</div>
-                    <div class="quest-item-meta">В процессе • Прогресс 65%</div>
-                    <div class="progress-bar-mini">
-                        <div class="progress-fill-mini" style="width: 65%;"></div>
-                    </div>
-                </div>
-                <div class="quest-item-actions">
-                    <button class="btn btn-primary btn-sm"><i class="fas fa-play"></i> Продолжить</button>
-                </div>
-            </div>
+            <div id="completedQuestsList"></div>
         </div>
         
         <!-- Мои команды -->
@@ -382,8 +326,6 @@
     </div>
 
     <script src="js/auth-api.js"></script>
-    <script src="js/theme-switcher.js"></script>
-    <script src="js/auth-api.js"></script>
 <script src="js/theme-switcher.js"></script>
 <script>
     if (!window.AuthApi) {
@@ -470,10 +412,74 @@
             if (usernameInput) usernameInput.value = me.username || '';
             if (emailInput) emailInput.value = me.role || '';
 
+            const completedEl = document.getElementById('statCompleted');
+            const ratingEl = document.getElementById('statRating');
+            const createdEl = document.getElementById('statCreated');
+            if (completedEl) completedEl.textContent = String(me.quests_completed ?? 0);
+            if (ratingEl) ratingEl.textContent = String(me.rating ?? 0);
+            if (createdEl) createdEl.textContent = String(me.published_routes_count ?? 0);
+
             localStorage.setItem('app_user', JSON.stringify(me));
         } catch (error) {
             console.error('Ошибка загрузки профиля:', error);
             window.location.href = 'login.html';
+        }
+    }
+
+    function statusBadge(status) {
+        if (status === 'Опубликовано') return '<span class="quest-status status-published"><i class="fas fa-check-circle"></i> Опубликован</span>';
+        if (status === 'На модерации') return '<span class="quest-status status-moderation"><i class="fas fa-hourglass-half"></i> На модерации</span>';
+        if (status === 'Черновик') return '<span class="quest-status status-draft"><i class="fas fa-pencil-alt"></i> Черновик</span>';
+        if (status === 'Скрыто') return '<span class="quest-status status-draft"><i class="fas fa-eye-slash"></i> Скрыт</span>';
+        if (status === 'Архив') return '<span class="quest-status status-draft"><i class="fas fa-box-archive"></i> Архив</span>';
+        return `<span class="quest-status status-draft">${status || 'Неизвестно'}</span>`;
+    }
+
+    async function loadCreatedQuests() {
+        const container = document.getElementById('createdQuestsList');
+        if (!container) return;
+        try {
+            const response = await AuthApi.authorizedFetch('/accounts/Me/CreatedQuests?from=0&count=50');
+            const items = Array.isArray(response?.items) ? response.items : [];
+            if (!items.length) {
+                container.innerHTML = `<div class="quest-item"><div class="quest-item-info"><div class="quest-item-title">Пока нет созданных квестов</div><div class="quest-item-meta">Создай свой первый маршрут</div></div></div>`;
+                return;
+            }
+            container.innerHTML = items.map((quest) => `
+                <div class="quest-item">
+                    <div class="quest-item-info">
+                        <div class="quest-item-title">${quest.title || 'Без названия'}</div>
+                        <div class="quest-item-meta">${quest.city_district || ''} • ${quest.duration_minutes || 0} минут • сложность ${quest.difficulty || 1}</div>
+                    </div>
+                    <div class="quest-item-actions">${statusBadge(quest.status)}</div>
+                </div>
+            `).join('');
+        } catch (error) {
+            container.innerHTML = `<div class="quest-item"><div class="quest-item-info"><div class="quest-item-title">Не удалось загрузить созданные квесты</div><div class="quest-item-meta">${error.message || ''}</div></div></div>`;
+        }
+    }
+
+    async function loadCompletedQuests() {
+        const container = document.getElementById('completedQuestsList');
+        if (!container) return;
+        try {
+            const response = await AuthApi.authorizedFetch('/accounts/Me/CompletedQuests?from=0&count=50');
+            const items = Array.isArray(response?.items) ? response.items : [];
+            if (!items.length) {
+                container.innerHTML = `<div class="quest-item"><div class="quest-item-info"><div class="quest-item-title">Пока нет пройденных квестов</div><div class="quest-item-meta">Пройди любой квест, чтобы он появился здесь</div></div></div>`;
+                return;
+            }
+            container.innerHTML = items.map((quest) => `
+                <div class="quest-item">
+                    <div class="quest-item-info">
+                        <div class="quest-item-title">${quest.title || 'Без названия'}</div>
+                        <div class="quest-item-meta">Пройден • ${quest.city_district || ''} • ${quest.duration_minutes || 0} минут</div>
+                    </div>
+                    <div class="quest-item-actions"><span class="quest-status status-published"><i class="fas fa-flag-checkered"></i> Завершён</span></div>
+                </div>
+            `).join('');
+        } catch (error) {
+            container.innerHTML = `<div class="quest-item"><div class="quest-item-info"><div class="quest-item-title">Не удалось загрузить пройденные квесты</div><div class="quest-item-meta">${error.message || ''}</div></div></div>`;
         }
     }
 
@@ -608,6 +614,8 @@
     document.getElementById('mobileLogoutBtn')?.addEventListener('click', handleLogout);
 
     loadProfile();
+    loadCreatedQuests();
+    loadCompletedQuests();
     loadTeams();
 </script>
 </body>
