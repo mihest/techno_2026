@@ -59,7 +59,7 @@ class QuestService:
         media_dir = BaseDir / "media" / "quests"
         media_dir.mkdir(parents=True, exist_ok=True)
         absolute_path = media_dir / file_name
-        relative_path = f"/media/quests/{file_name}"
+        relative_path = f"/api/media/quests/{file_name}"
 
         content = await file.read()
         if not content:

@@ -25,6 +25,8 @@ app.include_router(
 media_dir = BaseDir / "media"
 media_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/media", StaticFiles(directory=media_dir), name="media")
+# Also expose static files behind API prefix for reverse proxies.
+app.mount("/api/media", StaticFiles(directory=media_dir), name="media_api")
 
 # app.add_middleware(LogRequestsMiddleware)
 
