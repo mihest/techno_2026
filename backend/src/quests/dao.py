@@ -1,5 +1,7 @@
 from typing import Optional
 
+from datetime import datetime, timezone
+
 from sqlalchemy import select, func, cast
 from sqlalchemy.ext.asyncio import AsyncSession
 from geoalchemy2 import Geography
@@ -34,7 +36,7 @@ class QuestDAO:
             difficulty=data.difficulty,
             duration_minutes=data.duration_minutes,
             rules_warning=data.rules_warning,
-            status=data.status,
+            status=QuestStatusEnum.MODERATION,
             start_lat=data.start_lat,
             start_lng=data.start_lng,
             start_point=point_wkt,
@@ -42,6 +44,36 @@ class QuestDAO:
             client_extra=data.client_extra,
         )
         session.add(quest)
+        await session.flush()
+        return quest
+
+    @classmethod
+    async def list_for_moderation(cls, session: AsyncSession, offset: int, limit: int) -> tuple[list[Quest], int]:
+        where_clause = Quest.status == QuestStatusEnum.MODERATION
+        stmt = (
+            select(Quest)
+            .where(where_clause)
+            .order_by(Quest.created_at.asc())
+            .offset(offset)
+            .limit(limit)
+        )
+        count_stmt = select(func.count()).select_from(Quest).where(where_clause)
+        result = await session.execute(stmt)
+        total_result = await session.execute(count_stmt)
+        return result.scalars().all(), total_result.scalar_one()
+
+    @classmethod
+    async def set_moderation_publish(cls, session: AsyncSession, quest: Quest) -> Quest:
+        quest.status = QuestStatusEnum.PUBLISHED
+        quest.published_at = datetime.now(timezone.utc)
+        quest.rejection_reason = None
+        await session.flush()
+        return quest
+
+    @classmethod
+    async def set_moderation_reject(cls, session: AsyncSession, quest: Quest, reason: str) -> Quest:
+        quest.status = QuestStatusEnum.HIDDEN
+        quest.rejection_reason = reason
         await session.flush()
         return quest
 

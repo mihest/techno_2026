@@ -51,3 +51,9 @@ async def get_current_admin(current_user: UserModel = Depends(get_current_user))
     if current_user.role is not UserRoleEnum.ADMIN:
         raise HTTPException(status_code=403, detail="Not enough privileges.")
     return current_user
+
+
+async def get_current_moderator_or_admin(current_user: UserModel = Depends(get_current_user)):
+    if current_user.role not in (UserRoleEnum.ADMIN, UserRoleEnum.MODERATOR):
+        raise HTTPException(status_code=403, detail="Not enough privileges.")
+    return current_user

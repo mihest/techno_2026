@@ -104,3 +104,8 @@ class QuestDetailResponse(BaseModel):
 
 class QuestCoverUploadResponse(BaseModel):
     path: str
+
+
+class QuestModerationDecision(BaseModel):
+    action: Literal["publish", "reject"]
+    reason: str | None = None

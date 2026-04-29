@@ -4,7 +4,7 @@ from typing import Literal
 from fastapi import APIRouter, Query, Depends, UploadFile, File, Form, HTTPException, status
 
 from src.accounts.models import UserModel
-from src.auth.dependencies import get_current_user
+from src.auth.dependencies import get_current_user, get_current_moderator_or_admin
 from src.database import SessionDep
 from src.quests.schemas import (
     QuestListFilters,
@@ -12,6 +12,7 @@ from src.quests.schemas import (
     QuestDetailResponse,
     QuestCreate,
     QuestCoverUploadResponse,
+    QuestModerationDecision,
 )
 from src.quests.models import QuestStatusEnum
 from src.quests.service import QuestService
@@ -90,6 +91,36 @@ async def get_quests(
         limit=limit,
     )
     return await QuestService.get_quests(session, filters)
+
+
+@router.get(
+    "/moderation/pending",
+    response_model=QuestListResponse,
+    tags=["Quests - Moderation"],
+    summary="Список квестов на модерации",
+)
+async def get_pending_quests(
+    session: SessionDep,
+    offset: int = Query(default=0, ge=0, alias="from"),
+    limit: int = Query(default=20, ge=1, le=100, alias="count"),
+    moderator: UserModel = Depends(get_current_moderator_or_admin),
+):
+    return await QuestService.get_quests_for_moderation(session, offset=offset, limit=limit)
+
+
+@router.post(
+    "/{quest_id}/moderation/decision",
+    response_model=QuestDetailResponse,
+    tags=["Quests - Moderation"],
+    summary="Решение модератора по квесту",
+)
+async def moderate_quest(
+    session: SessionDep,
+    quest_id: uuid.UUID,
+    decision: QuestModerationDecision,
+    moderator: UserModel = Depends(get_current_moderator_or_admin),
+):
+    return await QuestService.moderate_quest(session, quest_id, decision)
 
 
 @router.get("/{quest_id}", response_model=QuestDetailResponse, tags=["Quests"], summary="Получение квеста по id с чекпоинтами")
