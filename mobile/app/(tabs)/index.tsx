@@ -1,98 +1,108 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { router } from 'expo-router';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { fetchQuests, QuestDetails } from '@/lib/api';
+import { neon } from '@/constants/neon';
 
-export default function HomeScreen() {
+export default function QuestsScreen() {
+  const [quests, setQuests] = useState<QuestDetails[]>([]);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchQuests()
+      .then((data) => {
+        setQuests(data.items || []);
+      })
+      .catch((e) => {
+        setError(e.message || 'Не удалось загрузить квесты');
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = quests.filter((item) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return `${item.title || ''} ${item.city_district || ''} ${item.category || ''}`.toLowerCase().includes(q);
+  });
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator />
+        <Text style={styles.muted}>Загружаем квесты...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.error}>Ошибка: {error}</Text>
+      </View>
+    );
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <FlatList
+      contentContainerStyle={styles.container}
+      data={filtered}
+      keyExtractor={(item) => item.id}
+      ListHeaderComponent={
+        <View style={styles.header}>
+          <Text style={styles.title}>Квесты</Text>
+          <TextInput
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Поиск по названию, району, категории"
+            placeholderTextColor={neon.textSecondary}
+            style={styles.searchInput}
+          />
+        </View>
+      }
+      renderItem={({ item }) => (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>{item.title || 'Без названия'}</Text>
+          <Text style={styles.meta}>{item.city_district || 'Локация не указана'}</Text>
+          <Text style={styles.meta}>Сложность: {item.difficulty || 0}/5 • {item.duration_minutes || 0} мин</Text>
+          <View style={styles.row}>
+            <Pressable style={styles.primaryBtn} onPress={() => router.push(`/quest/${item.id}`)}>
+              <Text style={styles.primaryBtnText}>Детали</Text>
+            </Pressable>
+            <Pressable style={styles.secondaryBtn} onPress={() => router.push(`/quest/${item.id}/play`)}>
+              <Text style={styles.secondaryBtnText}>Играть</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: { padding: 16, gap: 12, backgroundColor: neon.bgDark },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  header: { gap: 10, marginBottom: 4 },
+  title: { fontSize: 30, fontWeight: '800', marginBottom: 4, color: neon.yellow },
+  searchInput: {
+    backgroundColor: neon.bgCard,
+    borderColor: neon.border,
+    borderWidth: 1,
+    borderRadius: 22,
+    color: neon.textPrimary,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  card: { backgroundColor: neon.bgCard, borderRadius: 18, padding: 16, gap: 6, borderWidth: 1, borderColor: neon.border },
+  cardTitle: { color: neon.textPrimary, fontSize: 18, fontWeight: '700' },
+  meta: { color: neon.textSecondary, fontSize: 13 },
+  row: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  primaryBtn: { backgroundColor: neon.red, borderRadius: 20, paddingVertical: 10, paddingHorizontal: 14 },
+  primaryBtnText: { color: '#fff', fontWeight: '700' },
+  secondaryBtn: { borderWidth: 1.5, borderColor: neon.yellow, borderRadius: 20, paddingVertical: 10, paddingHorizontal: 14 },
+  secondaryBtnText: { color: neon.yellow, fontWeight: '700' },
+  muted: { color: neon.textSecondary },
+  error: { color: neon.red, paddingHorizontal: 20, textAlign: 'center' },
 });

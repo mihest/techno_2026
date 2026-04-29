@@ -43,7 +43,7 @@ services:
         volumes:
             - './ssl:/etc/nginx/ssl'
             - './nginx.conf:/etc/nginx/nginx.conf'
-            - './front/dist:/frontend'
+            - './frontend/template:/frontend'
         environment:
             - ENABLE_IPV6=false
         depends_on:
