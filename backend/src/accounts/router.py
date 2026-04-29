@@ -5,7 +5,16 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.accounts.models import UserModel
-from src.accounts.schemas import UserUpdate, UserResponse, UserCreateAdmin, UserCreate, UserUpdateAdmin, UserMeResponse
+from src.accounts.schemas import (
+    UserUpdate,
+    UserResponse,
+    UserCreateAdmin,
+    UserCreate,
+    UserUpdateAdmin,
+    UserMeResponse,
+    SoloLeaderboardItem,
+    TeamLeaderboardItem,
+)
 from src.accounts.service import UserService
 from src.auth.dependencies import get_current_user, get_current_admin
 from src.database import SessionDep
@@ -51,6 +60,22 @@ async def get_my_completed_quests(
 ):
     items, total = await UserService.get_completed_quests(user=user, session=session, offset=offset, limit=limit)
     return QuestListResponse(total=total, items=items)
+
+
+@router.get("/Leaderboard/Solo", response_model=list[SoloLeaderboardItem], tags=["Accounts - Leaderboard"], summary="Соло-лидерборд")
+async def get_solo_leaderboard(
+        session: SessionDep,
+        limit: int = Query(20, ge=1, le=100, alias="count"),
+):
+    return await UserService.get_solo_leaderboard(session=session, limit=limit)
+
+
+@router.get("/Leaderboard/Teams", response_model=list[TeamLeaderboardItem], tags=["Accounts - Leaderboard"], summary="Командный лидерборд")
+async def get_teams_leaderboard(
+        session: SessionDep,
+        limit: int = Query(20, ge=1, le=100, alias="count"),
+):
+    return await UserService.get_team_leaderboard(session=session, limit=limit)
 
 
 @router.get("", response_model=list[UserResponse], tags=["Accounts - Admin"], summary="Получение списка пользователей (кроме админов)")
