@@ -80,46 +80,20 @@ complaintForm?.addEventListener('submit', (e) => {
     closeComplaintModalFunc();
 });
 
-// Данные квеста
+const API_BASE_URL = (
+    window.AuthApi?.API_BASE_URL ||
+    window.AUTH_API_BASE_URL ||
+    localStorage.getItem('apiBaseUrl') ||
+    'https://mihest.ru/api'
+).replace(/\/$/, '');
+
 const questData = {
-    id: 1,
-    title: "Тайны Старого Арбата",
-    description: "Увлекательный квест по историческим переулкам Арбата. Вам предстоит найти тайные знаки, разгадать загадки прошлого и узнать интересные факты о знаменитых жителях этого района.",
-    district: "Арбат",
-    city: "Москва",
-    checkpoints: [
-        {
-            id: 1,
-            title: "Памятник Булату Окуджаве",
-            task: "Какой музыкальный инструмент изображён в руках у поэта?",
-            questionType: "code",
-            correctAnswer: "гитара",
-            hints: ["Струнный музыкальный инструмент", "У него 6 струн", "Любимый инструмент бардов"],
-            basePoints: 50,
-            coords: [55.7483, 37.5907]
-        },
-        {
-            id: 2,
-            title: "Стена Виктора Цоя",
-            task: "Какая известная песня Виктора Цоя начинается со слов 'Перемен!'?",
-            questionType: "choice",
-            options: ["Группа крови", "Звезда по имени Солнце", "Кукушка", "Хочу перемен!"],
-            correctOption: 3,
-            hints: ["Эта песня стала гимном перестройки", "Название содержит восклицательный знак", "Песня о желании изменений"],
-            basePoints: 50,
-            coords: [55.7490, 37.5930]
-        },
-        {
-            id: 3,
-            title: "Театр имени Вахтангова",
-            task: "В каком году был основан этот театр?",
-            questionType: "code",
-            correctAnswer: "1921",
-            hints: ["Основан в начале 1920-х годов", "Число от 1920 до 1925", "Год основания - 1921"],
-            basePoints: 50,
-            coords: [55.7503, 37.5945]
-        }
-    ]
+    id: null,
+    title: '',
+    description: '',
+    district: '',
+    city: '',
+    checkpoints: [],
 };
 
 let currentCheckpointIndex = 0;
@@ -129,6 +103,93 @@ let map = null;
 let placemarks = [];
 let startTime = new Date();
 let selectedOption = null;
+
+function getQuestId() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id') || params.get('quest_id');
+}
+
+function getBackendErrorMessage(errorData, fallback = 'Ошибка запроса') {
+    const detail = errorData?.detail || errorData?.message;
+
+    if (typeof detail === 'string') return detail;
+    if (Array.isArray(detail)) {
+        return detail
+            .map((item) => {
+                if (typeof item === 'string') return item;
+                return item?.msg || item?.message || JSON.stringify(item);
+            })
+            .join('\n');
+    }
+    if (typeof errorData === 'string') return errorData;
+
+    return fallback;
+}
+
+async function fetchQuestById(questId) {
+    if (window.AuthApi?.authorizedFetch) {
+        return window.AuthApi.authorizedFetch(`/quests/${encodeURIComponent(questId)}`, {
+            method: 'GET',
+            headers: { Accept: 'application/json' },
+        });
+    }
+
+    const response = await fetch(`${API_BASE_URL}/quests/${encodeURIComponent(questId)}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include',
+        headers: { Accept: 'application/json' },
+    });
+
+    const contentType = response.headers.get('content-type') || '';
+    const data = contentType.includes('application/json')
+        ? await response.json()
+        : await response.text();
+
+    if (!response.ok) {
+        throw new Error(getBackendErrorMessage(data, `HTTP ${response.status}`));
+    }
+
+    return data;
+}
+
+function getCheckpointCoords(checkpoint) {
+    const lat = Number(checkpoint.lat);
+    const lng = Number(checkpoint.lng);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return [lat, lng];
+    return null;
+}
+
+function normalizeCheckpoint(checkpoint, index) {
+    const answers = Array.isArray(checkpoint.answers) ? [...checkpoint.answers] : [];
+    const sortedAnswers = answers.sort((a, b) => (a.option_order || 0) - (b.option_order || 0));
+    const correctIndex = sortedAnswers.findIndex((item) => item.is_correct);
+    const questionType = checkpoint.question_type === 'choice' || sortedAnswers.length > 1 ? 'choice' : 'code';
+
+    return {
+        id: checkpoint.id ?? index + 1,
+        title: checkpoint.title || `Чекпоинт ${index + 1}`,
+        task: checkpoint.task || '',
+        questionType,
+        correctAnswer: sortedAnswers[correctIndex]?.answer_text || '',
+        options: sortedAnswers.map((item) => item.answer_text || ''),
+        correctOption: correctIndex,
+        hints: Array.isArray(checkpoint.hints) ? checkpoint.hints : [],
+        basePoints: 50,
+        coords: getCheckpointCoords(checkpoint),
+    };
+}
+
+function applyQuestData(data) {
+    questData.id = data.id;
+    questData.title = data.title || 'Без названия';
+    questData.description = data.description || '';
+
+    const location = String(data.city_district || '').split(',').map((part) => part.trim()).filter(Boolean);
+    questData.city = location[0] || data.city_district || 'Город не указан';
+    questData.district = location[1] || '';
+    questData.checkpoints = (Array.isArray(data.checkpoints) ? data.checkpoints : []).map(normalizeCheckpoint);
+}
 
 function calculatePointsForCheckpoint(checkpoint) {
     let points = checkpoint.basePoints;
@@ -140,13 +201,14 @@ function renderProgress() {
     const container = document.getElementById('playContent');
     if (!container) return;
     
-    const isCompleted = currentCheckpointIndex >= questData.checkpoints.length;
+    const hasCheckpoints = questData.checkpoints.length > 0;
+    const isCompleted = hasCheckpoints && currentCheckpointIndex >= questData.checkpoints.length;
     
     let headerHtml = `
         <div class="play-header">
             <div class="quest-info">
                 <h2><i class="fas fa-route" style="color: var(--yellow);"></i> ${questData.title}</h2>
-                <p><i class="fas fa-location-dot"></i> ${questData.city}, ${questData.district}</p>
+                <p><i class="fas fa-location-dot"></i> ${[questData.city, questData.district].filter(Boolean).join(', ') || 'Локация не указана'}</p>
             </div>
             <div class="progress-block">
                 <div class="checkpoint-circles" id="checkpointCircles"></div>
@@ -157,7 +219,22 @@ function renderProgress() {
         </div>
     `;
     
-    if (!isCompleted) {
+    if (!hasCheckpoints) {
+        container.innerHTML = headerHtml + `
+            <div class="task-container">
+                <div class="completion-card">
+                    <div class="completion-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h2>Нет чекпоинтов</h2>
+                    <p>Для этого квеста пока не добавлены чекпоинты.</p>
+                    <button class="btn btn-primary" onclick="window.location.href='index.html'">
+                        <i class="fas fa-home"></i> Вернуться к квестам
+                    </button>
+                </div>
+            </div>
+        `;
+    } else if (!isCompleted) {
         container.innerHTML = headerHtml + `
             <div class="map-container">
                 <div id="map"></div>
@@ -198,7 +275,7 @@ function renderProgress() {
                             <div>запланированного</div>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="window.location.href='../index.html'">
+                    <button class="btn btn-primary" onclick="window.location.href='index.html'">
                         <i class="fas fa-home"></i> Вернуться к квестам
                     </button>
                 </div>
@@ -231,7 +308,7 @@ function renderCurrentTask() {
     hintsUsedOnCurrentCheckpoint = 0;
     
     let hintsHtml = '';
-    cp.hints.forEach((hint, idx) => {
+    cp.hints.slice(0, 3).forEach((hint, idx) => {
         hintsHtml += `
             <div class="hint-card available" data-hint-index="${idx}" data-hint-text="${hint.replace(/"/g, '&quot;')}">
                 <div class="hint-text">
@@ -315,7 +392,7 @@ function renderCurrentTask() {
     document.querySelectorAll('.hint-card.available').forEach(hintCard => {
         hintCard.addEventListener('click', (e) => {
             e.stopPropagation();
-            const hintText = hintCard.querySelector('.hint-text span:last-child')?.textContent || '';
+            const hintText = hintCard.dataset.hintText || '';
             
             if (hintsUsedOnCurrentCheckpoint < 3) {
                 hintsUsedOnCurrentCheckpoint++;
@@ -395,6 +472,8 @@ function initMap() {
     }
     
     const cp = questData.checkpoints[currentCheckpointIndex];
+    if (!cp?.coords) return;
+
     ymaps.ready(() => {
         if (map) {
             map.destroy();
@@ -407,6 +486,7 @@ function initMap() {
         
         placemarks = [];
         questData.checkpoints.forEach((point, idx) => {
+            if (!point.coords) return;
             let color;
             if (idx < currentCheckpointIndex) color = '#02F4CA';
             else if (idx === currentCheckpointIndex) color = '#FFFF1B';
@@ -432,6 +512,7 @@ function initMap() {
 function updateMapMarkers() {
     if (!map) return;
     const cp = questData.checkpoints[currentCheckpointIndex];
+    if (!cp?.coords) return;
     map.setCenter(cp.coords, 15);
     placemarks.forEach((pm, idx) => {
         let color;
@@ -450,7 +531,7 @@ document.getElementById('playContent')?.addEventListener('click', (e) => {
         confirmBtn.textContent = 'Да, бросить';
         confirmBtn.onclick = () => {
             closeModal();
-            window.location.href = '../index.html';
+            window.location.href = 'index.html';
         };
         const cancelBtn = document.createElement('button');
         cancelBtn.className = 'btn btn-outline';
@@ -464,4 +545,57 @@ document.getElementById('playContent')?.addEventListener('click', (e) => {
 });
 
 window.openComplaintModal = openComplaintModal;
-renderProgress();
+
+function renderLoading(message = 'Загружаем квест...') {
+    const container = document.getElementById('playContent');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="task-container">
+            <div class="completion-card">
+                <div class="completion-icon">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <h2>${message}</h2>
+            </div>
+        </div>
+    `;
+}
+
+function renderLoadError(message) {
+    const container = document.getElementById('playContent');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="task-container">
+            <div class="completion-card">
+                <div class="completion-icon">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <h2>Не удалось загрузить квест</h2>
+                <p>${message}</p>
+            </div>
+        </div>
+    `;
+}
+
+async function loadQuestAndStart() {
+    const questId = getQuestId();
+    if (!questId) {
+        renderLoadError('В адресе страницы нет id квеста');
+        return;
+    }
+
+    renderLoading();
+
+    try {
+        const data = await fetchQuestById(questId);
+        applyQuestData(data);
+        renderProgress();
+    } catch (error) {
+        console.error('Quest play load failed', error);
+        renderLoadError(error.message || 'Неизвестная ошибка');
+    }
+}
+
+loadQuestAndStart();

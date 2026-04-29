@@ -11,7 +11,8 @@ from sqlalchemy import (
     CheckConstraint,
     Index,
     func,
-    Enum as SQLAlchemyEnum
+    Enum as SQLAlchemyEnum,
+    JSON,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -49,6 +50,12 @@ class Quest(Base):
     title: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     city_district: Mapped[str] = mapped_column(String(120), nullable=False)
+    category: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    age_group_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("age_groups.id"),
+        nullable=True,
+    )
 
     cover_file: Mapped[str] = mapped_column(String, nullable=True)
 
@@ -69,6 +76,8 @@ class Quest(Base):
         Geography(geometry_type="POINT", srid=4326),
         nullable=True,
     )
+    route_geometry: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    client_extra: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     published_at = mapped_column(DateTime(timezone=True), nullable=True)
     archived_at = mapped_column(DateTime(timezone=True), nullable=True)
@@ -94,6 +103,8 @@ class Quest(Base):
         Index("ix_quests_author_id", "author_id"),
         Index("ix_quests_status", "status"),
         Index("ix_quests_city_district", "city_district"),
+        Index("ix_quests_category", "category"),
+        Index("ix_quests_age_group_id", "age_group_id"),
         Index("ix_quests_difficulty", "difficulty"),
         Index("ix_quests_duration_minutes", "duration_minutes"),
         Index("ix_quests_created_at", "created_at"),
