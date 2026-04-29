@@ -85,14 +85,14 @@
                 <div class="filter-section">
                     <div class="filter-title"><i class="fas fa-tags"></i> Категории</div>
                     <div class="categories-list" id="categoryFilters">
-                        <span class="category-chip" data-cat="history">История</span>
-                        <span class="category-chip" data-cat="urban">Город</span>
-                        <span class="category-chip" data-cat="tech">Техно</span>
-                        <span class="category-chip" data-cat="nature">Природа</span>
-                        <span class="category-chip" data-cat="art">Искусство</span>
-                        <span class="category-chip" data-cat="food">Еда</span>
-                        <span class="category-chip" data-cat="mystic">Мистика</span>
-                        <span class="category-chip" data-cat="sport">Спорт</span>
+                        <span class="category-chip" data-cat="История">История</span>
+                        <span class="category-chip" data-cat="Урбанистика">Город</span>
+                        <span class="category-chip" data-cat="Техно">Техно</span>
+                        <span class="category-chip" data-cat="Природа">Природа</span>
+                        <span class="category-chip" data-cat="Искусство">Искусство</span>
+                        <span class="category-chip" data-cat="Еда">Еда</span>
+                        <span class="category-chip" data-cat="Мистика">Мистика</span>
+                        <span class="category-chip" data-cat="Спорт">Спорт</span>
                     </div>
                 </div>
                 
@@ -113,9 +113,11 @@
                     <div class="custom-select-wrapper">
                         <select class="custom-select" id="difficultySelect">
                             <option value="all">Все уровни</option>
-                            <option value="easy">Мне только спросить (1-2)</option>
-                            <option value="medium">Я бы ещё поиграл (3)</option>
-                            <option value="hard">Работают профи (4-5)</option>
+                            <option value="1">1 - Очень легко</option>
+                            <option value="2">2 - Легко</option>
+                            <option value="3">3 - Средне</option>
+                            <option value="4">4 - Сложно</option>
+                            <option value="5">5 - Экстрим</option>
                         </select>
                         <i class="fas fa-chevron-down select-arrow"></i>
                     </div>
@@ -126,11 +128,10 @@
                     <div class="custom-select-wrapper">
                         <select class="custom-select" id="durationSelect">
                             <option value="all">Любая</option>
-                            <option value="30">До 30 мин</option>
-                            <option value="60">До 1 часа</option>
-                            <option value="120">До 2 часов</option>
-                            <option value="180">До 3 часов</option>
-                            <option value="240">До 4 часов</option>
+                            <option value="up_to_30">До 30 мин</option>
+                            <option value="up_to_60">До 1 часа</option>
+                            <option value="up_to_120">До 2 часов</option>
+                            <option value="over_120">Больше 2 часов</option>
                         </select>
                         <i class="fas fa-chevron-down select-arrow"></i>
                     </div>
@@ -211,6 +212,7 @@
     </footer>
 
     <script src="js/theme-switcher.js"></script>
+    <script src="js/auth-api.js"></script>
     <script src="js/index.js"></script>
     <script src="js/menu.js"></script>
 </body>

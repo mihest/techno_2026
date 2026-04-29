@@ -13,7 +13,7 @@
         .steps-container {
             margin: 32px 0;
         }
-        
+
         .steps-indicator {
             display: flex;
             justify-content: space-between;
@@ -811,6 +811,7 @@
 
     <script src="https://api-maps.yandex.ru/2.1/?apikey=6b2b42a0-28a0-4e74-9f1b-7b685c9fd6cb&lang=ru_RU"></script>
     <script src="js/theme-switcher.js"></script>
+    <script src="js/auth-api.js"></script>
     <script>
                 // Бургер-меню и выход
         const burgerBtn = document.getElementById('burgerBtn');
@@ -839,7 +840,10 @@
         let activeCheckpointIndex = null;
         let selectedCoords = [55.751574, 37.573856];
         let coverData = null;
+        let selectedCoverFile = null;
         let selectedCategories = [];
+        const COVER_MAX_UPLOAD_BYTES = 700 * 1024;
+        const COVER_MAX_DIMENSION = 1280;
         
         // Список категорий
         const categoriesData = [
@@ -1029,6 +1033,7 @@
         }
         
         function handleCoverFile(file) {
+            selectedCoverFile = file;
             const reader = new FileReader();
             reader.onload = (event) => {
                 coverData = event.target.result;
@@ -1036,7 +1041,13 @@
                     coverPreviewDiv.innerHTML = `<div style="position:relative; display:inline-block;"><img src="${coverData}" style="max-width:200px; border-radius:16px; border:2px solid var(--yellow);"><button type="button" class="remove-cover" id="removeCoverBtn"><i class="fas fa-times"></i></button></div>`;
                     const removeBtn = document.getElementById('removeCoverBtn');
                     if (removeBtn) {
-                        removeBtn.addEventListener('click', () => { coverData = null; coverPreviewDiv.innerHTML = ''; coverInput.value = ''; updatePreview(); });
+                        removeBtn.addEventListener('click', () => {
+                            coverData = null;
+                            selectedCoverFile = null;
+                            coverPreviewDiv.innerHTML = '';
+                            coverInput.value = '';
+                            updatePreview();
+                        });
                     }
                 }
                 updatePreview();
@@ -1440,18 +1451,368 @@
                 disableChoiceRequired();
             });
         }
-        
-        const submitBtn = document.getElementById('submitBtn');
-        if (submitBtn) {
-            submitBtn.addEventListener('click', () => {
-                const titleInput = document.getElementById('questTitle');
-                if (!titleInput || !titleInput.value) { alert('Заполните название квеста'); currentStep = 1; updateStepUI(); return; }
-                if (checkpoints.length < 3) { alert('Добавьте минимум 3 чекпоинта'); currentStep = 2; updateStepUI(); return; }
-                alert('Квест успешно отправлен на модерацию! Ожидайте проверки (до 48 часов).');
+
+        function getFieldValue(id) {
+            return (document.getElementById(id)?.value || '').trim();
+        }
+
+        function getSelectLabel(id) {
+            const select = document.getElementById(id);
+            return (select?.options[select.selectedIndex]?.text || '').trim();
+        }
+
+        function getAgeGroupId() {
+            const select = document.getElementById('questAgeGroup');
+            const selectedValue = select?.value || '';
+            const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            const ageGroupIds = {
+                '14-15': '5705a746-c2fc-4cbe-98d2-a9e5c076f89b',
+                ...(window.QUEST_AGE_GROUP_IDS || {})
+            };
+
+            return uuidPattern.test(selectedValue)
+                ? selectedValue
+                : ageGroupIds[selectedValue] || ageGroupIds['14-15'];
+        }
+
+        function getCheckpointCoords(coords) {
+            const lat = Number(coords?.[0]);
+            const lng = Number(coords?.[1]);
+
+            return {
+                lat: Number.isFinite(lat) ? lat : null,
+                lng: Number.isFinite(lng) ? lng : null,
+                point: Number.isFinite(lat) && Number.isFinite(lng)
+                    ? { type: 'Point', coordinates: [lng, lat] }
+                    : null
+            };
+        }
+
+        function buildRulesWarning() {
+            const warnings = getFieldValue('questWarnings');
+            const rules = getFieldValue('questRules');
+            const whatToTake = getFieldValue('questWhatToTake');
+
+            return [
+                warnings ? `Warnings: ${warnings}` : '',
+                rules ? `Rules: ${rules}` : '',
+                whatToTake ? `What to take: ${whatToTake}` : ''
+            ].filter(Boolean).join('\n') || null;
+        }
+
+        function buildRouteCreatePayload() {
+            const city = getFieldValue('questCity');
+            const district = getFieldValue('questDistrict');
+            const ageGroupSelect = document.getElementById('questAgeGroup');
+            const category = selectedCategories[0] || '';
+            const firstCheckpoint = checkpoints[0] || null;
+            const start = getCheckpointCoords(firstCheckpoint?.coords || selectedCoords);
+            const routeCoordinates = checkpoints
+                .map((checkpoint) => getCheckpointCoords(checkpoint.coords).point?.coordinates)
+                .filter(Boolean);
+
+            return {
+                title: getFieldValue('questTitle'),
+                description: getFieldValue('questDescription'),
+                city_district: [city, district].filter(Boolean).join(', '),
+                difficulty: Number.parseInt(getFieldValue('questDifficulty'), 10) || 3,
+                duration_minutes: Number.parseInt(getFieldValue('questDuration'), 10) || 0,
+                rules_warning: buildRulesWarning(),
+                status: 'На модерации',
+                start_lat: start.lat,
+                start_lng: start.lng,
+                start_point: start.point,
+                route_geometry: {
+                    type: 'LineString',
+                    coordinates: routeCoordinates
+                },
+                client_extra: {
+                    city,
+                    district,
+                    age_group: {
+                        value: ageGroupSelect?.value || null,
+                        label: getSelectLabel('questAgeGroup') || null
+                    },
+                    categories: [...selectedCategories],
+                    cover_file_name: selectedCoverFile?.name || null
+                },
+                category,
+                age_group_id: getAgeGroupId(),
+                checkpoints: checkpoints.map((checkpoint, index) => {
+                    const coords = getCheckpointCoords(checkpoint.coords);
+                    const correctOption = checkpoint.correctOption ?? null;
+                    const answerOptions = (checkpoint.options || []).map((option, optionIndex) => ({
+                        option_order: optionIndex + 1,
+                        answer_text: option,
+                        is_correct: optionIndex === correctOption
+                    }));
+
+                    return {
+                        order: index + 1,
+                        title: checkpoint.title,
+                        task: checkpoint.task,
+                        question_type: checkpoint.questionType,
+                        address: checkpoint.address || '',
+                        lat: coords.lat,
+                        lng: coords.lng,
+                        point: coords.point,
+                        hints: checkpoint.hints || [],
+                        point_rules: checkpoint.pointRules || '',
+                        correct_code: checkpoint.questionType === 'code' ? checkpoint.correctCode || '' : '',
+                        answer_options: checkpoint.questionType === 'choice' ? answerOptions : []
+                    };
+                })
+            };
+        }
+
+        function getBackendErrorMessage(errorData, fallback = 'Ошибка запроса') {
+            const detail = errorData?.detail || errorData?.message;
+
+            if (typeof detail === 'string') return detail;
+            if (Array.isArray(detail)) {
+                return detail
+                    .map((item) => {
+                        if (typeof item === 'string') return item;
+                        return item?.msg || item?.message || JSON.stringify(item);
+                    })
+                    .join('\n');
+            }
+            if (typeof errorData === 'string') return errorData;
+
+            return fallback;
+        }
+
+        function getQuestApiBaseUrl() {
+            return (
+                window.AuthApi?.API_BASE_URL ||
+                window.AUTH_API_BASE_URL ||
+                localStorage.getItem('apiBaseUrl') ||
+                'https://mihest.ru/api'
+            ).replace(/\/$/, '');
+        }
+
+        function getStoredAuthHeaders() {
+            try {
+                const session = JSON.parse(localStorage.getItem('imprezzio_auth') || 'null');
+                if (!session?.accessToken) return {};
+
+                return {
+                    Authorization: `${session.tokenType || 'Bearer'} ${session.accessToken}`
+                };
+            } catch {
+                return {};
+            }
+        }
+
+        function formatBytes(bytes) {
+            if (!bytes) return '0 KB';
+            if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        }
+
+        function getImageFromFile(file) {
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                const objectUrl = URL.createObjectURL(file);
+
+                image.onload = () => {
+                    URL.revokeObjectURL(objectUrl);
+                    resolve(image);
+                };
+                image.onerror = () => {
+                    URL.revokeObjectURL(objectUrl);
+                    reject(new Error('Не удалось прочитать обложку'));
+                };
+                image.src = objectUrl;
             });
         }
-        
+
+        function canvasToBlob(canvas, type, quality) {
+            return new Promise((resolve) => {
+                canvas.toBlob(resolve, type, quality);
+            });
+        }
+
+        function getCoverUploadName(file) {
+            const baseName = (file.name || 'cover').replace(/\.[^.]+$/, '') || 'cover';
+            return `${baseName}.jpg`;
+        }
+
+        async function compressCoverFile(file) {
+            if (!file || !file.type.startsWith('image/')) return file;
+            if (file.size <= COVER_MAX_UPLOAD_BYTES) return file;
+
+            const image = await getImageFromFile(file);
+            const maxSides = [
+                COVER_MAX_DIMENSION,
+                1080,
+                900,
+                720,
+                600
+            ];
+            const qualities = [0.82, 0.72, 0.62, 0.52, 0.42];
+            let bestBlob = null;
+
+            for (const maxSide of maxSides) {
+                const scale = Math.min(1, maxSide / image.width, maxSide / image.height);
+                const width = Math.max(1, Math.round(image.width * scale));
+                const height = Math.max(1, Math.round(image.height * scale));
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+
+                canvas.width = width;
+                canvas.height = height;
+                context.fillStyle = '#ffffff';
+                context.fillRect(0, 0, width, height);
+                context.drawImage(image, 0, 0, width, height);
+
+                for (const quality of qualities) {
+                    const blob = await canvasToBlob(canvas, 'image/jpeg', quality);
+                    if (!blob) continue;
+                    if (!bestBlob || blob.size < bestBlob.size) bestBlob = blob;
+                    if (blob.size <= COVER_MAX_UPLOAD_BYTES) {
+                        return new File([blob], getCoverUploadName(file), { type: 'image/jpeg' });
+                    }
+                }
+            }
+
+            if (!bestBlob) {
+                throw new Error('Не удалось сжать обложку');
+            }
+
+            return new File([bestBlob], getCoverUploadName(file), { type: 'image/jpeg' });
+        }
+
+        async function getCoverUploadFile() {
+            if (!selectedCoverFile) return null;
+
+            const uploadFile = await compressCoverFile(selectedCoverFile);
+            if (uploadFile.size > selectedCoverFile.size) return selectedCoverFile;
+
+            console.log(
+                'Cover upload file',
+                `${selectedCoverFile.name}: ${formatBytes(selectedCoverFile.size)} -> ${uploadFile.name}: ${formatBytes(uploadFile.size)}`
+            );
+
+            return uploadFile;
+        }
+
+        async function buildQuestFormData(payload) {
+            const formData = new FormData();
+            const coverFile = await getCoverUploadFile();
+
+            formData.append('payload', JSON.stringify(payload));
+            if (coverFile) {
+                formData.append('cover', coverFile);
+            }
+
+            return formData;
+        }
+
+        async function sendRouteCreatePayload(payload) {
+            const formData = await buildQuestFormData(payload);
+            window.lastRouteCreateFormData = formData;
+
+            const response = await fetch(`${getQuestApiBaseUrl()}/quests`, {
+                method: 'POST',
+                credentials: 'include',
+                mode: 'cors',
+                headers: {
+                    Accept: 'application/json',
+                    ...getStoredAuthHeaders()
+                },
+                body: formData
+            });
+
+            const contentType = response.headers.get('content-type') || '';
+            const data = contentType.includes('application/json')
+                ? await response.json()
+                : await response.text();
+
+            if (!response.ok) {
+                throw new Error(getBackendErrorMessage(data, `HTTP ${response.status}`));
+            }
+
+            return data;
+        }
+
+        function validateRouteBeforeSend() {
+            if (getFieldValue('questTitle').length < 5) {
+                alert('Заполните название квеста, минимум 5 символов');
+                currentStep = 1;
+                updateStepUI();
+                return false;
+            }
+
+            if (getFieldValue('questDescription').length < 30) {
+                alert('Описание должно быть не короче 30 символов');
+                currentStep = 1;
+                updateStepUI();
+                return false;
+            }
+
+            if (!getFieldValue('questCity') || !getFieldValue('questDistrict')) {
+                alert('Заполните город и район');
+                currentStep = 1;
+                updateStepUI();
+                return false;
+            }
+
+            if ((Number.parseInt(getFieldValue('questDuration'), 10) || 0) <= 0) {
+                alert('Укажите длительность квеста');
+                currentStep = 1;
+                updateStepUI();
+                return false;
+            }
+
+            if (!selectedCategories.length) {
+                alert('Выберите категорию квеста');
+                currentStep = 1;
+                updateStepUI();
+                return false;
+            }
+
+            if (checkpoints.length < 3) {
+                alert('Добавьте минимум 3 чекпоинта');
+                currentStep = 2;
+                updateStepUI();
+                return false;
+            }
+
+            return true;
+        }
+
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', async (event) => {
+                event.preventDefault();
+
+                if (!validateRouteBeforeSend()) return;
+
+                const routeCreatePayload = buildRouteCreatePayload();
+                window.lastRouteCreatePayload = routeCreatePayload;
+                console.groupCollapsed('Route create payload');
+                console.log(routeCreatePayload);
+                console.log(JSON.stringify(routeCreatePayload, null, 2));
+                console.groupEnd();
+
+                submitBtn.disabled = true;
+                try {
+                    const result = await sendRouteCreatePayload(routeCreatePayload);
+                    window.lastRouteCreateResponse = result;
+                    console.log('Route create response', result);
+                    alert('Квест успешно отправлен на модерацию!');
+                } catch (error) {
+                    console.error('Route create failed', error);
+                    alert(`Не удалось отправить квест: ${error.message}`);
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
         // Инициализация
+
         renderCategories();
         refreshCheckpointsUi();
         updateStepUI();
