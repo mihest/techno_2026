@@ -830,6 +830,12 @@
         logoutBtn?.addEventListener('click', handleLogout);
         mobileLogoutBtn?.addEventListener('click', handleLogout);
         
+        const API_BASE_URL = (
+            window.AuthApi?.API_BASE_URL ||
+            localStorage.getItem('apiBaseUrl') ||
+            'https://mihest.ru/api'
+        ).replace(/\/$/, '');
+
         // Данные
         let checkpoints = [];
         let editingIndex = null;
@@ -839,6 +845,7 @@
         let activeCheckpointIndex = null;
         let selectedCoords = [55.751574, 37.573856];
         let coverData = null;
+        let coverFile = null;
         let selectedCategories = [];
         
         // Список категорий
@@ -1029,6 +1036,7 @@
         }
         
         function handleCoverFile(file) {
+            coverFile = file;
             const reader = new FileReader();
             reader.onload = (event) => {
                 coverData = event.target.result;
@@ -1036,7 +1044,13 @@
                     coverPreviewDiv.innerHTML = `<div style="position:relative; display:inline-block;"><img src="${coverData}" style="max-width:200px; border-radius:16px; border:2px solid var(--yellow);"><button type="button" class="remove-cover" id="removeCoverBtn"><i class="fas fa-times"></i></button></div>`;
                     const removeBtn = document.getElementById('removeCoverBtn');
                     if (removeBtn) {
-                        removeBtn.addEventListener('click', () => { coverData = null; coverPreviewDiv.innerHTML = ''; coverInput.value = ''; updatePreview(); });
+                        removeBtn.addEventListener('click', () => {
+                            coverData = null;
+                            coverFile = null;
+                            coverPreviewDiv.innerHTML = '';
+                            coverInput.value = '';
+                            updatePreview();
+                        });
                     }
                 }
                 updatePreview();
@@ -1442,12 +1456,154 @@
         }
         
         const submitBtn = document.getElementById('submitBtn');
+        function getAuthHeader() {
+            try {
+                const session = JSON.parse(localStorage.getItem('imprezzio_auth') || 'null');
+                if (!session?.accessToken) return {};
+                return { Authorization: `${session.tokenType || 'Bearer'} ${session.accessToken}` };
+            } catch {
+                return {};
+            }
+        }
+
+        function mapCheckpointToPayload(cp, index) {
+            const base = {
+                order: index + 1,
+                title: cp.title,
+                task: cp.task,
+                question_type: cp.questionType,
+                address: '',
+                lat: cp.coords[0],
+                lng: cp.coords[1],
+                point: {
+                    type: 'Point',
+                    coordinates: [cp.coords[1], cp.coords[0]]
+                },
+                hints: cp.hints || [],
+                point_rules: cp.pointRules || ''
+            };
+
+            if (cp.questionType === 'code') {
+                return { ...base, correct_code: cp.correctCode };
+            }
+
+            return {
+                ...base,
+                answer_options: (cp.options || []).map((option, optionIndex) => ({
+                    option_order: optionIndex + 1,
+                    answer_text: option,
+                    is_correct: optionIndex === cp.correctOption
+                }))
+            };
+        }
+
+        function buildQuestPayload() {
+            const city = (document.getElementById('questCity').value || '').trim();
+            const district = (document.getElementById('questDistrict').value || '').trim();
+            const warnings = (document.getElementById('questWarnings').value || '').trim();
+            const rules = (document.getElementById('questRules').value || '').trim();
+            const whatToTake = (document.getElementById('questWhatToTake').value || '').trim();
+
+            const rawDuration = (document.getElementById('questDuration').value || '').trim();
+            const parsedDuration = Number.parseInt(rawDuration, 10);
+            const durationMinutes = Number.isFinite(parsedDuration) ? parsedDuration : 0;
+
+            const routeCoordinates = checkpoints
+                .filter(cp => Array.isArray(cp.coords) && cp.coords.length === 2)
+                .map(cp => [cp.coords[1], cp.coords[0]]);
+
+            const firstCheckpoint = checkpoints[0];
+            const startLat = firstCheckpoint?.coords?.[0] ?? selectedCoords[0];
+            const startLng = firstCheckpoint?.coords?.[1] ?? selectedCoords[1];
+
+            return {
+                title: (document.getElementById('questTitle').value || '').trim(),
+                description: (document.getElementById('questDescription').value || '').trim(),
+                city_district: `${city}${district ? `, ${district}` : ''}`,
+                difficulty: Number(document.getElementById('questDifficulty').value || 1),
+                duration_minutes: durationMinutes,
+                rules_warning: [warnings ? `Warnings: ${warnings}` : '', rules ? `Rules: ${rules}` : '', whatToTake ? `What to take: ${whatToTake}` : '']
+                    .filter(Boolean)
+                    .join('\n'),
+                status: 'На модерации',
+                start_lat: startLat,
+                start_lng: startLng,
+                start_point: {
+                    type: 'Point',
+                    coordinates: [startLng, startLat]
+                },
+                route_geometry: {
+                    type: 'LineString',
+                    coordinates: routeCoordinates
+                },
+                client_extra: {
+                    city,
+                    district,
+                    age_group: {
+                        value: document.getElementById('questAgeGroup').value,
+                        label: document.getElementById('questAgeGroup').options[document.getElementById('questAgeGroup').selectedIndex]?.text || ''
+                    },
+                    categories: selectedCategories
+                },
+                checkpoints: checkpoints.map(mapCheckpointToPayload)
+            };
+        }
+
         if (submitBtn) {
-            submitBtn.addEventListener('click', () => {
+            submitBtn.addEventListener('click', async () => {
                 const titleInput = document.getElementById('questTitle');
                 if (!titleInput || !titleInput.value) { alert('Заполните название квеста'); currentStep = 1; updateStepUI(); return; }
                 if (checkpoints.length < 3) { alert('Добавьте минимум 3 чекпоинта'); currentStep = 2; updateStepUI(); return; }
-                alert('Квест успешно отправлен на модерацию! Ожидайте проверки (до 48 часов).');
+
+                const payload = buildQuestPayload();
+                if (payload.description.length < 30) {
+                    alert('Описание должно быть не короче 30 символов');
+                    currentStep = 1;
+                    updateStepUI();
+                    return;
+                }
+                if (!Number.isInteger(payload.duration_minutes) || payload.duration_minutes < 30 || payload.duration_minutes > 235) {
+                    alert('Длительность должна быть целым числом от 30 до 235 минут');
+                    currentStep = 1;
+                    updateStepUI();
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('payload', JSON.stringify(payload));
+                if (coverFile) {
+                    formData.append('cover', coverFile);
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+                try {
+                    const response = await fetch(`${API_BASE_URL}/quests`, {
+                        method: 'POST',
+                        headers: {
+                            ...getAuthHeader()
+                        },
+                        credentials: 'include',
+                        body: formData
+                    });
+
+                    const responseBody = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        const detail = responseBody?.detail;
+                        const errorMessage = Array.isArray(detail)
+                            ? detail.map(item => item.msg || JSON.stringify(item)).join('\n')
+                            : (typeof detail === 'string' ? detail : `HTTP ${response.status}`);
+                        throw new Error(errorMessage);
+                    }
+
+                    alert('Квест успешно создан и отправлен на модерацию!');
+                    window.location.href = 'profile.html';
+                } catch (error) {
+                    alert(`Не удалось создать квест: ${error.message}`);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить на модерацию';
+                }
             });
         }
         
