@@ -11,6 +11,8 @@ from src.teams.schemas import TeamCreate, TeamCreateDB
 
 
 class TeamService:
+    MAX_TEAM_MEMBERS = 6
+
     @classmethod
     async def get(cls, session: AsyncSession, user: UserModel):
         return await TeamDAO.find_one_or_none(session, TeamMemberModel.user_id == user.id)
@@ -20,6 +22,10 @@ class TeamService:
         team = await TeamDAO.find_one_or_none(session, TeamModel.join_code == code)
         if not team:
             raise HTTPException(404, detail="Team not found")
+
+        members_count = await TeamDAO.count_members(session, team.id)
+        if members_count >= cls.MAX_TEAM_MEMBERS:
+            raise HTTPException(400, detail=f"Team size limit is {cls.MAX_TEAM_MEMBERS} members")
 
         return await TeamDAO.add_member(session, {
             "user_id": user.id,

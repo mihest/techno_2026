@@ -1,7 +1,7 @@
 from typing import Optional, Union, Dict, Any
 
 from fastapi import HTTPException
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, func
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -124,3 +124,9 @@ class TeamDAO(BaseDAO[TeamModel, TeamCreateDB, None]):
         except Exception as e:
             print(e)
             raise UnknownDatabaseException
+
+    @classmethod
+    async def count_members(cls, session: AsyncSession, team_id) -> int:
+        stmt = select(func.count()).select_from(TeamMemberModel).where(TeamMemberModel.team_id == team_id)
+        result = await session.execute(stmt)
+        return result.scalar_one()

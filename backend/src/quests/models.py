@@ -49,6 +49,12 @@ class Quest(Base):
     title: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     city_district: Mapped[str] = mapped_column(String(120), nullable=False)
+    category: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    age_group_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("age_groups.id"),
+        nullable=True,
+    )
 
     cover_file: Mapped[str] = mapped_column(String, nullable=True)
 
@@ -94,6 +100,8 @@ class Quest(Base):
         Index("ix_quests_author_id", "author_id"),
         Index("ix_quests_status", "status"),
         Index("ix_quests_city_district", "city_district"),
+        Index("ix_quests_category", "category"),
+        Index("ix_quests_age_group_id", "age_group_id"),
         Index("ix_quests_difficulty", "difficulty"),
         Index("ix_quests_duration_minutes", "duration_minutes"),
         Index("ix_quests_created_at", "created_at"),

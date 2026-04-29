@@ -7,6 +7,12 @@ from sqlalchemy import UUID, String, Boolean, Enum as SQLAlchemyEnum, func, TIME
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
+class FileModel(Base):
+    __tablename__ = 'files'
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    path: Mapped[str] = mapped_column(String, nullable=False)
+
+
 class TeamMemberModel(Base):
     __tablename__ = 'team_members'
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
