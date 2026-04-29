@@ -1,0 +1,4 @@
+./sh/install-node.sh
+./sh/run-node.sh
+./sh/install-docker.sh
+./sh/build-docker.sh
