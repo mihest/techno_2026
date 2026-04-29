@@ -3,16 +3,55 @@ from typing import Optional
 from sqlalchemy import select, func, cast
 from sqlalchemy.ext.asyncio import AsyncSession
 from geoalchemy2 import Geography
+from geoalchemy2.elements import WKTElement
 
 from src.quests.models import Quest, QuestStatusEnum
-from src.quests.schemas import QuestListFilters
+from src.quests.schemas import QuestListFilters, QuestCreate
 
 
 class QuestDAO:
     @classmethod
+    async def create(cls, session: AsyncSession, author_id, data: QuestCreate) -> Quest:
+        category = data.category
+        if not category and data.client_extra:
+            categories = data.client_extra.get("categories") or []
+            if categories:
+                category = str(categories[0])
+
+        point_wkt = None
+        if data.start_point and data.start_point.type == "Point":
+            lng, lat = data.start_point.coordinates
+            point_wkt = WKTElement(f"POINT({lng} {lat})", srid=4326)
+
+        quest = Quest(
+            author_id=author_id,
+            title=data.title,
+            description=data.description,
+            city_district=data.city_district,
+            category=category,
+            age_group_id=data.age_group_id,
+            cover_file=data.cover_file,
+            difficulty=data.difficulty,
+            duration_minutes=data.duration_minutes,
+            rules_warning=data.rules_warning,
+            status=data.status,
+            start_lat=data.start_lat,
+            start_lng=data.start_lng,
+            start_point=point_wkt,
+            route_geometry=data.route_geometry.model_dump() if data.route_geometry else None,
+            client_extra=data.client_extra,
+        )
+        session.add(quest)
+        await session.flush()
+        return quest
+
+    @classmethod
     async def list_with_total(cls, session: AsyncSession, filters: QuestListFilters) -> tuple[list[Quest], int]:
-        where_clauses = [Quest.status == QuestStatusEnum.PUBLISHED]
+        where_clauses = []
         distance_expr = None
+
+        if filters.status is not None:
+            where_clauses.append(Quest.status == filters.status)
 
         if filters.category:
             where_clauses.append(Quest.category == filters.category)
@@ -66,7 +105,7 @@ class QuestDAO:
         return result.scalars().all(), total_result.scalar_one()
 
     @classmethod
-    async def get_published_by_id(cls, session: AsyncSession, quest_id) -> Optional[Quest]:
-        stmt = select(Quest).where(Quest.id == quest_id, Quest.status == QuestStatusEnum.PUBLISHED)
+    async def get_by_id(cls, session: AsyncSession, quest_id) -> Optional[Quest]:
+        stmt = select(Quest).where(Quest.id == quest_id)
         result = await session.execute(stmt)
         return result.scalars().one_or_none()

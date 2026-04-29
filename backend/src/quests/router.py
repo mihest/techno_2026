@@ -1,18 +1,31 @@
 import uuid
 from typing import Literal
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Depends
 
+from src.accounts.models import UserModel
+from src.auth.dependencies import get_current_user
 from src.database import SessionDep
-from src.quests.schemas import QuestListFilters, QuestListResponse, QuestDetailResponse
+from src.quests.schemas import QuestListFilters, QuestListResponse, QuestDetailResponse, QuestCreate
+from src.quests.models import QuestStatusEnum
 from src.quests.service import QuestService
 
 router = APIRouter()
 
 
+@router.post("", response_model=QuestDetailResponse, status_code=201, tags=["Quests"], summary="Создание квеста")
+async def create_quest(
+    session: SessionDep,
+    data: QuestCreate,
+    user: UserModel = Depends(get_current_user),
+):
+    return await QuestService.create_quest(session, user, data)
+
+
 @router.get("", response_model=QuestListResponse, tags=["Quests"], summary="Получение списка опубликованных квестов")
 async def get_quests(
     session: SessionDep,
+    status: QuestStatusEnum | None = Query(default=None),
     category: str | None = Query(default=None),
     city_district: str | None = Query(default=None),
     age_group_id: uuid.UUID | None = Query(default=None),
@@ -27,6 +40,7 @@ async def get_quests(
     limit: int = Query(default=20, ge=1, le=100, alias="count"),
 ):
     filters = QuestListFilters(
+        status=status,
         category=category,
         city_district=city_district,
         age_group_id=age_group_id,

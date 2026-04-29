@@ -11,7 +11,8 @@ from sqlalchemy import (
     CheckConstraint,
     Index,
     func,
-    Enum as SQLAlchemyEnum
+    Enum as SQLAlchemyEnum,
+    JSON,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -75,6 +76,8 @@ class Quest(Base):
         Geography(geometry_type="POINT", srid=4326),
         nullable=True,
     )
+    route_geometry: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    client_extra: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     published_at = mapped_column(DateTime(timezone=True), nullable=True)
     archived_at = mapped_column(DateTime(timezone=True), nullable=True)
