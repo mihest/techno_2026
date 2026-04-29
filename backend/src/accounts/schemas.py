@@ -105,3 +105,19 @@ class UserMeResponse(UserResponse):
     quests_completed: int
     rating: int
     published_routes_count: int
+
+
+class SoloLeaderboardItem(BaseModel):
+    user_id: uuid.UUID
+    username: str
+    completed_quests: int
+    rating: int
+    average_time_minutes: int | None = None
+
+
+class TeamLeaderboardItem(BaseModel):
+    team_id: uuid.UUID
+    team_name: str
+    completed_quests: int
+    rating: int
+    average_time_minutes: int | None = None

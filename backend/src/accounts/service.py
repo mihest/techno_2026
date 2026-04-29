@@ -9,9 +9,10 @@ from src.accounts.models import UserModel, UserRoleEnum
 from src.accounts.schemas import UserUpdate, UserUpdateDB, \
     UserCreate, UserCreateDB, UserCreateAdmin, UserUpdateAdmin, UserMeResponse
 from src.auth.utils import get_password_hash
-from src.quest_sessions.models import QuestSession, QuestSessionStatusEnum, QuestSessionCheckpointAttempt
+from src.quest_sessions.models import QuestSession, QuestSessionStatusEnum, QuestSessionCheckpointAttempt, QuestSessionModeEnum
 from src.quests.models import Quest, QuestStatusEnum
-from src.teams.models import TeamMemberModel
+from src.teams.models import TeamMemberModel, TeamModel
+from src.accounts.schemas import SoloLeaderboardItem, TeamLeaderboardItem
 
 
 class UserService:
@@ -172,5 +173,117 @@ class UserService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         await UserDAO.update(session, UserModel.id == user.id, obj_in={'is_deleted': True})
+
+    @classmethod
+    async def get_solo_leaderboard(cls, session: AsyncSession, limit: int) -> list[SoloLeaderboardItem]:
+        completed_stmt = (
+            select(
+                QuestSession.owner_user_id.label("user_id"),
+                func.count(QuestSession.id).label("completed_quests"),
+                func.avg(
+                    func.extract("epoch", QuestSession.completed_at - QuestSession.started_at) / 60.0
+                ).label("avg_minutes"),
+            )
+            .where(
+                QuestSession.mode == QuestSessionModeEnum.SOLO,
+                QuestSession.status == QuestSessionStatusEnum.COMPLETED,
+                QuestSession.owner_user_id.is_not(None),
+            )
+            .group_by(QuestSession.owner_user_id)
+        )
+        completed_rows = (await session.execute(completed_stmt)).all()
+
+        rating_stmt = (
+            select(
+                QuestSession.owner_user_id.label("user_id"),
+                func.count(QuestSessionCheckpointAttempt.id).label("rating"),
+            )
+            .select_from(QuestSessionCheckpointAttempt)
+            .join(QuestSession, QuestSession.id == QuestSessionCheckpointAttempt.session_id)
+            .where(
+                QuestSession.mode == QuestSessionModeEnum.SOLO,
+                QuestSession.owner_user_id.is_not(None),
+                QuestSessionCheckpointAttempt.is_correct.is_(True),
+            )
+            .group_by(QuestSession.owner_user_id)
+        )
+        rating_rows = (await session.execute(rating_stmt)).all()
+        rating_map = {row.user_id: int(row.rating or 0) for row in rating_rows}
+
+        user_ids = [row.user_id for row in completed_rows]
+        if not user_ids:
+            return []
+        user_stmt = select(UserModel.id, UserModel.username).where(UserModel.id.in_(user_ids))
+        user_rows = (await session.execute(user_stmt)).all()
+        user_map = {row.id: row.username for row in user_rows}
+
+        result = [
+            SoloLeaderboardItem(
+                user_id=row.user_id,
+                username=user_map.get(row.user_id, "Unknown"),
+                completed_quests=int(row.completed_quests or 0),
+                rating=rating_map.get(row.user_id, 0),
+                average_time_minutes=int(row.avg_minutes) if row.avg_minutes is not None else None,
+            )
+            for row in completed_rows
+        ]
+        result.sort(key=lambda x: (-x.rating, -x.completed_quests, (x.average_time_minutes or 10**9)))
+        return result[:limit]
+
+    @classmethod
+    async def get_team_leaderboard(cls, session: AsyncSession, limit: int) -> list[TeamLeaderboardItem]:
+        completed_stmt = (
+            select(
+                QuestSession.owner_team_id.label("team_id"),
+                func.count(QuestSession.id).label("completed_quests"),
+                func.avg(
+                    func.extract("epoch", QuestSession.completed_at - QuestSession.started_at) / 60.0
+                ).label("avg_minutes"),
+            )
+            .where(
+                QuestSession.mode == QuestSessionModeEnum.TEAM,
+                QuestSession.status == QuestSessionStatusEnum.COMPLETED,
+                QuestSession.owner_team_id.is_not(None),
+            )
+            .group_by(QuestSession.owner_team_id)
+        )
+        completed_rows = (await session.execute(completed_stmt)).all()
+
+        rating_stmt = (
+            select(
+                QuestSession.owner_team_id.label("team_id"),
+                func.count(QuestSessionCheckpointAttempt.id).label("rating"),
+            )
+            .select_from(QuestSessionCheckpointAttempt)
+            .join(QuestSession, QuestSession.id == QuestSessionCheckpointAttempt.session_id)
+            .where(
+                QuestSession.mode == QuestSessionModeEnum.TEAM,
+                QuestSession.owner_team_id.is_not(None),
+                QuestSessionCheckpointAttempt.is_correct.is_(True),
+            )
+            .group_by(QuestSession.owner_team_id)
+        )
+        rating_rows = (await session.execute(rating_stmt)).all()
+        rating_map = {row.team_id: int(row.rating or 0) for row in rating_rows}
+
+        team_ids = [row.team_id for row in completed_rows]
+        if not team_ids:
+            return []
+        team_stmt = select(TeamModel.id, TeamModel.name).where(TeamModel.id.in_(team_ids))
+        team_rows = (await session.execute(team_stmt)).all()
+        team_map = {row.id: row.name for row in team_rows}
+
+        result = [
+            TeamLeaderboardItem(
+                team_id=row.team_id,
+                team_name=team_map.get(row.team_id, "Unknown"),
+                completed_quests=int(row.completed_quests or 0),
+                rating=rating_map.get(row.team_id, 0),
+                average_time_minutes=int(row.avg_minutes) if row.avg_minutes is not None else None,
+            )
+            for row in completed_rows
+        ]
+        result.sort(key=lambda x: (-x.rating, -x.completed_quests, (x.average_time_minutes or 10**9)))
+        return result[:limit]
 
 
