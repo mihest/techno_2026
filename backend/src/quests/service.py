@@ -1,13 +1,47 @@
+import uuid
+from pathlib import Path
+
 from fastapi import HTTPException, status
+from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.checkpoints.service import CheckpointService
 from src.quests.dao import QuestDAO
 from src.quests.schemas import QuestListFilters, QuestListResponse, QuestDetailResponse, QuestCreate
 from src.accounts.models import UserModel
+from src.config import BaseDir
+from src.teams.models import FileModel
 
 
 class QuestService:
+    @classmethod
+    async def upload_cover(cls, session: AsyncSession, file: UploadFile) -> str:
+        if not file.content_type or not file.content_type.startswith("image/"):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Only image files are allowed")
+
+        original_suffix = Path(file.filename or "").suffix.lower()
+        suffix = original_suffix if original_suffix else ".jpg"
+        file_name = f"{uuid.uuid4().hex}{suffix}"
+
+        media_dir = BaseDir / "media" / "quests"
+        media_dir.mkdir(parents=True, exist_ok=True)
+        absolute_path = media_dir / file_name
+        relative_path = f"/media/quests/{file_name}"
+
+        content = await file.read()
+        if not content:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded file is empty")
+
+        max_size_bytes = 10 * 1024 * 1024
+        if len(content) > max_size_bytes:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Image is too large (max 10MB)")
+
+        absolute_path.write_bytes(content)
+        session.add(FileModel(path=relative_path))
+        await session.flush()
+
+        return relative_path
+
     @classmethod
     async def create_quest(cls, session: AsyncSession, user: UserModel, data: QuestCreate) -> QuestDetailResponse:
         try:

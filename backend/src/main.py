@@ -3,8 +3,10 @@ import uvicorn
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from . import all_routers
+from .config import BaseDir
 
 
 app = FastAPI(
@@ -19,6 +21,10 @@ app.include_router(
     all_routers,
     # prefix='/api',
 )
+
+media_dir = BaseDir / "media"
+media_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/media", StaticFiles(directory=media_dir), name="media")
 
 # app.add_middleware(LogRequestsMiddleware)
 

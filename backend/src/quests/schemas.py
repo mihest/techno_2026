@@ -100,3 +100,7 @@ class QuestDetailResponse(BaseModel):
     published_at: datetime | None
     created_at: datetime
     checkpoints: list[QuestCheckpointItem]
+
+
+class QuestCoverUploadResponse(BaseModel):
+    path: str

@@ -1,24 +1,59 @@
 import uuid
 from typing import Literal
 
-from fastapi import APIRouter, Query, Depends
+from fastapi import APIRouter, Query, Depends, UploadFile, File, Form, HTTPException, status
 
 from src.accounts.models import UserModel
 from src.auth.dependencies import get_current_user
 from src.database import SessionDep
-from src.quests.schemas import QuestListFilters, QuestListResponse, QuestDetailResponse, QuestCreate
+from src.quests.schemas import (
+    QuestListFilters,
+    QuestListResponse,
+    QuestDetailResponse,
+    QuestCreate,
+    QuestCoverUploadResponse,
+)
 from src.quests.models import QuestStatusEnum
 from src.quests.service import QuestService
 
 router = APIRouter()
 
 
+@router.post(
+    "/upload-cover",
+    response_model=QuestCoverUploadResponse,
+    status_code=201,
+    tags=["Quests"],
+    summary="Загрузка обложки квеста",
+)
+async def upload_quest_cover(
+    session: SessionDep,
+    file: UploadFile = File(...),
+    user: UserModel = Depends(get_current_user),
+):
+    path = await QuestService.upload_cover(session, file)
+    return QuestCoverUploadResponse(path=path)
+
+
 @router.post("", response_model=QuestDetailResponse, status_code=201, tags=["Quests"], summary="Создание квеста")
 async def create_quest(
     session: SessionDep,
-    data: QuestCreate,
+    payload: str = Form(...),
+    cover: UploadFile | None = File(default=None),
     user: UserModel = Depends(get_current_user),
 ):
+    try:
+        data = QuestCreate.model_validate_json(payload)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid payload JSON: {exc}",
+        )
+
+    if cover is not None:
+        cover_path = await QuestService.upload_cover(session, cover)
+        data = data.model_copy(update={"cover_file": cover_path})
+
     return await QuestService.create_quest(session, user, data)
 
 
